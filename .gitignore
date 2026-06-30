@@ -1,0 +1,42 @@
+# === Secrets (never commit — rotate if leaked, see CLAUDE.md) ===
+.env
+.env.*
+!.env.example
+
+# === Node / Next.js ===
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# === Vercel ===
+.vercel/
+
+# === Python (Scrapling recall scraper) ===
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.scrapling/
+
+# === loop-eng / superpowers agent artifacts (process, not product) ===
+docs/superpowers/
+docs/loop-eng/
+.claude/loop-eng-profile.md
+tasks.md
+
+# === Claude Code local ===
+CLAUDE.md
+.claude/settings.local.json
+.claude.local.md
+
+# === OS / editor ===
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+npm-debug.log*
