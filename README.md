@@ -12,7 +12,9 @@ hidden additives, halal doubts, and live government recall alerts.
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-lightgrey)](LICENSE)
 
-<sub>🚧 In active development at Attention House 2026 — public demo coming soon.</sub>
+### [→ Try the live demo](https://nyata.vercel.app)
+
+<sub>🚧 Built live at Attention House 2026 — shipping daily. The demo updates in real time as we build.</sub>
 
 </div>
 
