@@ -114,8 +114,13 @@ export async function getProductByBarcode(
 ): Promise<Product | null> {
   return withFallback(
     // Live: S10 engine (cache → OpenFoodFacts) via the server-action boundary.
-    () => getProductByBarcodeReal(barcode),
-    // Fallback: mock product, or null for a known-not-found barcode.
+    // A live null for a KNOWN demo barcode (has a mock fixture) means "not in OFF
+    // yet" — backfill the fixture so the demo spine never dies. A live null for a
+    // genuinely-unknown barcode (no fixture) stays null → scan-flow's not-found.
+    async () => {
+      const live = await getProductByBarcodeReal(barcode);
+      return live ?? MOCK_PRODUCTS[barcode] ?? null;
+    },
     () => MOCK_PRODUCTS[barcode] ?? null,
   );
 }
@@ -123,7 +128,17 @@ export async function getProductByBarcode(
 export async function getVerdict(barcode: string): Promise<Verdict> {
   return withFallback<Verdict>(
     // Live: S10 verdict engine (cache → OFF → AI; stubs on failure) via server action.
-    () => getVerdictReal(barcode),
+    // When the engine returns an empty stub (no flags — product not in OFF / no AI
+    // key / AI failed) but we HAVE a mock verdict for this demo barcode, backfill
+    // the fixture so the demo shows the intended verdict. Real AI output (flags
+    // present) always wins over the fixture.
+    async () => {
+      const live = await getVerdictReal(barcode);
+      if (live.flags.length === 0 && MOCK_VERDICTS[barcode]) {
+        return MOCK_VERDICTS[barcode];
+      }
+      return live;
+    },
     // Fallback: mock verdict, or a neutral "no information" verdict for an unknown
     // barcode. Copy stays informational/non-diagnostic (design-system §9).
     () =>
