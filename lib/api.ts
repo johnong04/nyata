@@ -23,6 +23,12 @@ import { MOCK_FEED_RECALLS } from "@/lib/mock/recalls";
 import { MOCK_FEED } from "@/lib/mock/feed";
 import { MOCK_SCANS } from "@/lib/mock/scans";
 import { MOCK_PROFILE } from "@/lib/mock/profile";
+import {
+  getProfileReal,
+  saveProfileReal,
+  getScanHistoryReal,
+  logScanReal,
+} from "@/lib/api-server";
 
 /** Simulate a tiny network hop so loading states are exercisable. */
 const tick = <T>(value: T, ms = 120): Promise<T> =>
@@ -86,18 +92,54 @@ export async function getFeedRecalls(): Promise<Recall[]> {
   return tick(recalls);
 }
 
+/**
+ * S9: real Supabase-backed reads/writes behind this seam. Each tries the
+ * signed-in path (`lib/api-server.ts`, server actions, RLS-scoped) and FALLS
+ * BACK to mock/guest on null or error — so guests, unconfigured env, and any
+ * backend hiccup all keep the demo running. Guest mode is preserved by design.
+ * // SEAM: S13 keeps these signatures; only the real/mock split lives here.
+ */
 export async function getScanHistory(): Promise<Scan[]> {
-  // S13: swap to real backend behind try/catch → mock.
-  return tick(MOCK_SCANS);
+  try {
+    const real = await getScanHistoryReal();
+    if (real) return real; // signed-in: own history (may be empty)
+  } catch {
+    // fall through to mock
+  }
+  return tick(MOCK_SCANS); // guest / unconfigured / error
 }
 
 export async function getProfile(): Promise<Profile> {
-  // S13: swap to real backend behind try/catch → mock.
-  return tick(MOCK_PROFILE);
+  try {
+    const real = await getProfileReal();
+    if (real) return real;
+  } catch {
+    // fall through to mock
+  }
+  return tick(MOCK_PROFILE); // guest / unconfigured / error
 }
 
 export async function saveProfile(conditions: string[]): Promise<void> {
-  // S13: swap to real backend behind try/catch → mock.
+  try {
+    const ok = await saveProfileReal(conditions);
+    if (ok) return; // persisted to Supabase (signed-in)
+  } catch {
+    // fall through to mock
+  }
+  // Guest / unconfigured: persist in-memory for the session so the UI is honest.
   MOCK_PROFILE.conditions = conditions;
   await tick(undefined, 80);
+}
+
+/**
+ * Log a scan. No-op for guests (returns silently). Server-only path derives the
+ * user_id from the validated session — never from client input. Called from the
+ * product page (server component) after a successful scan.
+ */
+export async function logScan(barcode: string): Promise<void> {
+  try {
+    await logScanReal(barcode);
+  } catch {
+    // Never block the verdict on a logging failure.
+  }
 }
