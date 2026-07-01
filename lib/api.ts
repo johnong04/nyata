@@ -1,0 +1,89 @@
+/**
+ * Nyata data seam. This is the REAL interface — the seven contract signatures
+ * every screen calls. In S1 the bodies read from `lib/mock/*`.
+ *
+ * S13: swap each body to the real backend behind try/catch → mock. Keep the
+ * signatures + types stable; only the implementation changes. Do not thicken
+ * this file — it is a thin seam by design.
+ */
+
+import type {
+  FeedFilter,
+  FeedItem,
+  Product,
+  Profile,
+  Recall,
+  Scan,
+  Verdict,
+} from "@/lib/types";
+import { MOCK_PRODUCTS } from "@/lib/mock/products";
+import { MOCK_VERDICTS } from "@/lib/mock/verdicts";
+import { MOCK_RECALLS, NO_RECALLS } from "@/lib/mock/recalls";
+import { MOCK_FEED } from "@/lib/mock/feed";
+import { MOCK_SCANS } from "@/lib/mock/scans";
+import { MOCK_PROFILE } from "@/lib/mock/profile";
+
+/** Simulate a tiny network hop so loading states are exercisable. */
+const tick = <T>(value: T, ms = 120): Promise<T> =>
+  new Promise((resolve) => setTimeout(() => resolve(value), ms));
+
+/** Returns null for an unknown barcode so scan-flow (S3) hits the not-found path. */
+export async function getProductByBarcode(
+  barcode: string
+): Promise<Product | null> {
+  // S13: swap to real backend behind try/catch → mock.
+  return tick(MOCK_PRODUCTS[barcode] ?? null);
+}
+
+export async function getVerdict(barcode: string): Promise<Verdict> {
+  // S13: swap to real backend behind try/catch → mock.
+  const verdict = MOCK_VERDICTS[barcode];
+  if (verdict) return tick(verdict);
+  // Unknown-but-scanned fallback: an empty SELAMAT-ish verdict.
+  return tick({
+    flags: [],
+    rating: 0,
+    summary_bm: "Tiada maklumat tersedia untuk produk ini.",
+    summary_en: "No information available for this product.",
+  });
+}
+
+export async function getRecallsForProduct(p: Product): Promise<Recall[]> {
+  // S13: swap to real backend behind try/catch → mock.
+  // Legal invariant: on any failure this falls back to [] — NEVER a fabricated recall.
+  return tick(MOCK_RECALLS[p.barcode] ?? NO_RECALLS);
+}
+
+export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
+  // S13: swap to real backend behind try/catch → mock.
+  const items = [...MOCK_FEED];
+  switch (filter) {
+    case "worst":
+      return tick(items.sort((a, b) => b.rating - a.rating));
+    case "newest":
+      return tick(
+        items.sort(
+          (a, b) =>
+            new Date(b.scanned_at).getTime() - new Date(a.scanned_at).getTime()
+        )
+      );
+    case "recalled":
+      return tick(items.filter((i) => i.recalled));
+  }
+}
+
+export async function getScanHistory(): Promise<Scan[]> {
+  // S13: swap to real backend behind try/catch → mock.
+  return tick(MOCK_SCANS);
+}
+
+export async function getProfile(): Promise<Profile> {
+  // S13: swap to real backend behind try/catch → mock.
+  return tick(MOCK_PROFILE);
+}
+
+export async function saveProfile(conditions: string[]): Promise<void> {
+  // S13: swap to real backend behind try/catch → mock.
+  MOCK_PROFILE.conditions = conditions;
+  await tick(undefined, 80);
+}

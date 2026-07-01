@@ -34,6 +34,10 @@ CLAUDE.md
 .claude.local.md
 .agents/
 
+# === Playwright CLI (keep sanity screenshots, drop transient snapshots/logs) ===
+.playwright-cli/*
+!.playwright-cli/*.png
+
 # === OS / editor ===
 .DS_Store
 Thumbs.db

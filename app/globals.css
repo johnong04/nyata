@@ -4,12 +4,42 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Nyata brand tokens — "The Redacted Label" (design-system §2). ──
+   Ink is load-bearing: redaction bars, text, buttons, active tab, premium. */
+@theme {
+  --color-ink: #17140f;
+  --color-ink-70: #4a453d;
+  --color-ink-40: #8c857a;
+  --color-paper: #faf9f6;
+  --color-card: #ffffff;
+  --color-surface-2: #f2f1ed;
+  --color-line: #e7e4dc;
+
+  /* Verdict semantics — ONLY inside verdict badges / ratings / recall blocks */
+  --color-selamat: #1e874b;
+  --color-selamat-bg: #e7f2ea;
+  --color-waspada: #e08a00;
+  --color-waspada-bg: #fbf0dc;
+  --color-elak: #d33118;
+  --color-elak-bg: #fbe6e1;
+
+  /* Reveal glow — what's UNDER the bar when it lifts. Never a verdict, never a CTA fill. */
+  --color-reveal: #f2a900;
+
+  /* Brand faces (design-system §4) */
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+
+  /* Redaction bars & stamps are square; everything else rounds (§5) */
+  --radius-none: 0;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -18,11 +48,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -43,78 +68,67 @@
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* shadcn semantic vars remapped to the Nyata palette (§2). Light only — this
+   is a document, not a dark-mode app; .dark inherits the same to stay safe. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #faf9f6; /* paper */
+  --foreground: #17140f; /* ink */
+  --card: #ffffff;
+  --card-foreground: #17140f;
+  --popover: #ffffff;
+  --popover-foreground: #17140f;
+  --primary: #17140f; /* ink */
+  --primary-foreground: #faf9f6;
+  --secondary: #f2f1ed; /* surface-2 */
+  --secondary-foreground: #17140f;
+  --muted: #f2f1ed;
+  --muted-foreground: #8c857a; /* ink-40 */
+  --accent: #f2f1ed;
+  --accent-foreground: #17140f;
+  --destructive: #d33118; /* elak */
+  --border: #e7e4dc; /* line */
+  --input: #e7e4dc;
+  --ring: #17140f;
+  --radius: 0.75rem; /* buttons/inputs; cards use rounded-2xl */
+  --sidebar: #faf9f6;
+  --sidebar-foreground: #17140f;
+  --sidebar-primary: #17140f;
+  --sidebar-primary-foreground: #faf9f6;
+  --sidebar-accent: #f2f1ed;
+  --sidebar-accent-foreground: #17140f;
+  --sidebar-border: #e7e4dc;
+  --sidebar-ring: #17140f;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #faf9f6;
+  --foreground: #17140f;
+  --card: #ffffff;
+  --card-foreground: #17140f;
+  --popover: #ffffff;
+  --popover-foreground: #17140f;
+  --primary: #17140f;
+  --primary-foreground: #faf9f6;
+  --secondary: #f2f1ed;
+  --secondary-foreground: #17140f;
+  --muted: #f2f1ed;
+  --muted-foreground: #8c857a;
+  --accent: #f2f1ed;
+  --accent-foreground: #17140f;
+  --destructive: #d33118;
+  --border: #e7e4dc;
+  --input: #e7e4dc;
+  --ring: #17140f;
+  --sidebar: #faf9f6;
+  --sidebar-foreground: #17140f;
+  --sidebar-primary: #17140f;
+  --sidebar-primary-foreground: #faf9f6;
+  --sidebar-accent: #f2f1ed;
+  --sidebar-accent-foreground: #17140f;
+  --sidebar-border: #e7e4dc;
+  --sidebar-ring: #17140f;
 }
 
 @layer base {
@@ -122,9 +136,61 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    background: var(--color-paper);
+    color: var(--color-ink);
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+/* ── Typographic scale + document idioms (design-system §4). ── */
+@layer components {
+  /* Display headline — Bricolage, tight */
+  .type-display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 10vw, 3.25rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  /* The verdict word — the biggest thing on any screen */
+  .type-verdict {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 16vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+  }
+  /* Mono eyebrow — CLASSIFIED · TERSEMBUNYI */
+  .type-eyebrow {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    color: var(--color-ink-40);
+  }
+  /* Mono document data — E-numbers, barcodes, citations */
+  .type-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+  }
+}
+
+@layer utilities {
+  /* Faint document texture — official stationery. Atmosphere, not noise (§5). */
+  .bg-document {
+    background-image: radial-gradient(
+      var(--color-line) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
+  .font-display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
   }
 }
