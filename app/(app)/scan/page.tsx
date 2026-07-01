@@ -1,13 +1,17 @@
-import { ScreenHeader } from "@/components/nyata/screen-header";
+import type { Metadata, Viewport } from "next";
+import { ScanClient } from "./scan-client";
+
+export const metadata: Metadata = {
+  title: "Imbas · Scan — Nyata",
+  description: "Halakan kamera ke barkod produk untuk putusan segera.",
+};
+
+// Full-height camera stage: lock the viewport so the video fills without bounce.
+export const viewport: Viewport = {
+  themeColor: "#17140f",
+  maximumScale: 1,
+};
 
 export default function ScanPage() {
-  return (
-    <div>
-      <ScreenHeader eyebrow="Imbas · Scan" title="Imbas produk">
-        Halakan kamera ke barkod produk. Kami baca label, silang rujuk KKM, dan
-        beri putusan.
-      </ScreenHeader>
-      <p className="type-mono text-ink-40">// camera + barcode reticle land in S3</p>
-    </div>
-  );
+  return <ScanClient />;
 }
