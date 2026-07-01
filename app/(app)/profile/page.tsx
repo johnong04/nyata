@@ -1,12 +1,15 @@
+import { getProfile } from "@/lib/api";
 import { ScreenHeader } from "@/components/nyata/screen-header";
+import { ProfilePanel } from "@/components/account/profile-panel";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const profile = await getProfile();
   return (
     <div>
-      <ScreenHeader eyebrow="Akaun · Account" title="Profil">
+      <ScreenHeader eyebrow="Fail peribadi · Personal file" title="Profil">
         Tetapkan keadaan kesihatan anda supaya putusan lebih peribadi.
       </ScreenHeader>
-      <p className="type-mono text-ink-40">// profile + premium land in later slices</p>
+      <ProfilePanel initial={profile} />
     </div>
   );
 }

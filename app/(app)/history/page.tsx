@@ -1,12 +1,15 @@
+import { getScanHistory } from "@/lib/api";
 import { ScreenHeader } from "@/components/nyata/screen-header";
+import { HistoryList } from "@/components/account/history-list";
 
-export default function HistoryPage() {
+export default async function HistoryPage() {
+  const items = await getScanHistory();
   return (
     <div>
-      <ScreenHeader eyebrow="Log · Rekod" title="Sejarah">
+      <ScreenHeader eyebrow="Log · Rekod imbasan" title="Sejarah">
         Setiap produk yang anda imbas, tersimpan untuk rujukan.
       </ScreenHeader>
-      <p className="type-mono text-ink-40">// scan history lands in a later slice</p>
+      <HistoryList items={items} />
     </div>
   );
 }

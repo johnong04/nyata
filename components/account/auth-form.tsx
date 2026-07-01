@@ -1,0 +1,135 @@
+"use client";
+
+/**
+ * AuthForm — shared login/signup visual stub ("The Redacted Label", §1/§9).
+ *
+ * NON-FUNCTIONAL by design: this is S7 UI only. Submit + Google both no-op and
+ * route optimistically to /profile. Real Supabase email/OTP + Google OAuth wire
+ * in S9 — see the marked seam below. Do NOT add network auth here.
+ *
+ * Email/OTP (no password field) + Google, per specs §2 feat 7. Ink chrome only;
+ * the primary CTA is ink, never turmeric (turmeric = reveal glow / stamp only).
+ */
+
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const COPY = {
+  login: {
+    eyebrow: "AKAUN · ACCOUNT",
+    bm: "Masuk semula",
+    en: "Welcome back",
+    swapText: "Belum ada akaun?",
+    swapCta: "Daftar · Sign up",
+    swapHref: "/signup",
+  },
+  signup: {
+    eyebrow: "DAFTAR · SIGN UP",
+    bm: "Buka fail anda",
+    en: "Open your file",
+    swapText: "Sudah ada akaun?",
+    swapCta: "Masuk · Log in",
+    swapHref: "/login",
+  },
+} as const;
+
+function GoogleG() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.57c2.08-1.92 3.27-4.74 3.27-8.09Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.76c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.4 14.97.4 12 .4A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75Z"
+      />
+    </svg>
+  );
+}
+
+export function AuthForm({ mode }: { mode: "login" | "signup" }) {
+  const router = useRouter();
+  const copy = COPY[mode];
+
+  // S9: real Supabase email/OTP + Google OAuth wires here. Stub only — no network.
+  const stubProceed = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    router.push("/profile");
+  };
+
+  return (
+    <form
+      onSubmit={stubProceed}
+      className="mx-auto flex w-full max-w-sm flex-col gap-7"
+    >
+      <div className="flex flex-col gap-2">
+        <p className="type-eyebrow">{copy.eyebrow}</p>
+        {/* Classified-dossier signature: a thin redacted rule under the eyebrow. */}
+        <span aria-hidden className="h-1 w-16 bg-ink" />
+        <h1 className="type-display mt-2 text-[2.25rem] leading-[0.95] text-ink">
+          {copy.bm}
+        </h1>
+        <p className="font-mono text-sm text-ink-40">{copy.en}</p>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label htmlFor="email" className="type-eyebrow text-[0.6875rem]">
+          E-MEL · EMAIL
+        </label>
+        <Input
+          id="email"
+          type="email"
+          required
+          placeholder="nama@contoh.com"
+          className="h-11 rounded-xl border-line bg-card px-3.5 text-base"
+        />
+      </div>
+
+      <Button
+        type="submit"
+        className="h-11 rounded-xl bg-ink text-paper hover:bg-ink/90"
+      >
+        Hantar kod · Send code
+      </Button>
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="type-eyebrow text-[0.6875rem]">ATAU · OR</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => stubProceed()}
+        className="h-11 gap-2 rounded-xl border-line bg-card text-ink hover:bg-surface-2"
+      >
+        <GoogleG />
+        Teruskan dengan Google · Continue with Google
+      </Button>
+
+      <p className="text-center text-sm text-ink-70">
+        {copy.swapText}{" "}
+        <Link
+          href={copy.swapHref}
+          className="font-medium text-ink underline underline-offset-2"
+        >
+          {copy.swapCta}
+        </Link>
+      </p>
+    </form>
+  );
+}
+
+export default AuthForm;
