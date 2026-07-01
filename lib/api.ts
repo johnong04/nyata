@@ -19,6 +19,7 @@ import type {
 import { MOCK_PRODUCTS } from "@/lib/mock/products";
 import { MOCK_VERDICTS } from "@/lib/mock/verdicts";
 import { MOCK_RECALLS, NO_RECALLS } from "@/lib/mock/recalls";
+import { MOCK_FEED_RECALLS } from "@/lib/mock/recalls";
 import { MOCK_FEED } from "@/lib/mock/feed";
 import { MOCK_SCANS } from "@/lib/mock/scans";
 import { MOCK_PROFILE } from "@/lib/mock/profile";
@@ -70,6 +71,19 @@ export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
     case "recalled":
       return tick(items.filter((i) => i.recalled));
   }
+}
+
+/**
+ * Official recalls surfaced in the community feed (S6). DATA-INTEGRITY CRITICAL
+ * PATH (specs §6, design-system §9): republishes official-source records ONLY.
+ * Fails closed — any recall lacking an `official_url` is dropped here, never
+ * rendered, so the UI can trust every card it receives carries a live source
+ * link. Real backend (S11) keeps this filter; it is the legal invariant.
+ */
+export async function getFeedRecalls(): Promise<Recall[]> {
+  // S13: swap to real backend behind try/catch → mock.
+  const recalls = MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url));
+  return tick(recalls);
 }
 
 export async function getScanHistory(): Promise<Scan[]> {
