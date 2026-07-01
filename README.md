@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# Nyata
 
-First, run the development server:
+### The fine print, revealed.
+
+Scan any product in Malaysia and get a two-second verdict on what's *really* inside —
+hidden additives, halal doubts, and live government recall alerts.
+
+[**▶ Try it live — nyata.vercel.app**](https://nyata.vercel.app)
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com)
+[![Deployed on Vercel](https://img.shields.io/badge/Vercel-live-black?logo=vercel)](https://nyata.vercel.app)
+[![License](https://img.shields.io/badge/license-see%20LICENSE-lightgrey)](LICENSE)
+
+</div>
+
+---
+
+## What is Nyata?
+
+**Nyata** (Malay for *"revealed"*) turns the ingredient label nobody reads into a verdict anyone can act on.
+Point your camera at a barcode — or snap the label — and Nyata tells you, in plain BM + English:
+
+- 🧪 **What's hiding inside** — additives, excess sugar/sodium, allergens, halal-doubtful ingredients, each flagged per-ingredient.
+- 🏛️ **Whether it's been recalled** — cross-checked against official Malaysian government records (MOH, mySAFE/KPDN, NPRA), always linked to the source.
+- 📊 **An overall rating** — one glance, one decision.
+
+Every scan produces a clean, shareable **verdict card** — because the best consumer warning is the one people actually post.
+
+> [!NOTE]
+> Nyata **informs, it doesn't diagnose.** Recall data is republished from official sources only, with links — never our own accusation. Halal status defers to JAKIM unless official data says otherwise.
+
+<div align="center">
+<br>
+<!-- Drop the hero verdict-card screenshot here once the card is built: -->
+<!-- <img src="docs/verdict-card.png" alt="Nyata verdict card" width="360"> -->
+<em>📸 Verdict card preview — coming with the D2 build.</em>
+<br><br>
+</div>
+
+## Features
+
+| | Feature | How it works |
+|---|---|---|
+| 📷 | **Instant scan** | Barcode via the native `BarcodeDetector` API → OpenFoodFacts lookup; OCR fallback for thin local coverage. |
+| 🤖 | **AI verdict** | Ingredients → Vercel AI SDK (`generateObject`, strict schema) → per-ingredient flags + rating + bilingual summary. |
+| 🚨 | **Recall cross-check** | Matched against a live table of scraped official recalls, quoted and sourced. |
+| 🪪 | **Personal profile** | Set your conditions (allergy · diabetic · pregnant · buying-for-kid) — Nyata flags what's risky *for you*. |
+| 🖼️ | **Shareable verdict card** | Every result renders as a postable image with a deep link back. |
+| 📰 | **Hidden Ingredients feed** | A public ranking of worst offenders, sourced only from official records. |
+
+## Tech stack
+
+**Next.js 16** (App Router · PWA · Turbopack · React 19) · **Tailwind v4** · **shadcn/ui + Aceternity UI** ·
+**Supabase** (Postgres · Auth · Storage) · **Vercel AI SDK 6** + Gemini (vision OCR + structured verdict) ·
+`barcode-detector` ponyfill · **Stripe + ToyyibPay** · **Scrapling** (Python recall scraper) · deployed on **Vercel**.
+
+## Quickstart
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/johnong04/nyata.git
+cd nyata
+npm install
+
+cp .env.example .env.local   # fill Supabase + Gemini keys
+npm run dev                  # → http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires **Node 20+**. See [`.env.example`](.env.example) for the keys you'll need.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Roadmap
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [x] **D1** — Scaffold · barcode scan · OpenFoodFacts lookup · deploy
+- [ ] **D2** — AI verdict + OCR fallback · shareable verdict card · auth + scan logging
+- [ ] **D3** — Recall scraper → cross-check · public Hidden Ingredients feed
+- [ ] **D4** — Personal profiles + paywall (ToyyibPay + Stripe)
+- [ ] **D5** — Hardening · full BM copy · analytics
 
-## Learn More
+## Built in public
 
-To learn more about Next.js, take a look at the following resources:
+Nyata is being built live at **Attention House 2026** — a 5-day filmed hacker house in Johor Bahru, Malaysia (8–12 Jul 2026). Follow the daily build.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See [LICENSE](LICENSE).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<div align="center">
+<sub>Made in Malaysia 🇲🇾 · <strong>Nyata</strong> — the fine print, revealed.</sub>
+</div>
