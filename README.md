@@ -7,13 +7,12 @@
 Scan any product in Malaysia and get a two-second verdict on what's *really* inside —
 hidden additives, halal doubts, and live government recall alerts.
 
-[**▶ Try it live — nyata.vercel.app**](https://nyata.vercel.app)
-
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ecf8e?logo=supabase&logoColor=white)](https://supabase.com)
-[![Deployed on Vercel](https://img.shields.io/badge/Vercel-live-black?logo=vercel)](https://nyata.vercel.app)
 [![License](https://img.shields.io/badge/license-see%20LICENSE-lightgrey)](LICENSE)
+
+<sub>🚧 In active development at Attention House 2026 — public demo coming soon.</sub>
 
 </div>
 
