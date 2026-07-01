@@ -18,45 +18,78 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
-const STEPS = [
+const BARCODE_STEPS = [
   { bm: "Membaca label", en: "Reading label" },
+  { bm: "Rujuk silang MOH", en: "Cross-referencing MOH" },
+  { bm: "Semak bahan tambahan", en: "Checking additives" },
+] as const;
+
+// OCR path leads with the actual label read (that's the slow, real work here),
+// so the narration matches what the server is doing (§6: process narration only).
+const OCR_STEPS = [
+  { bm: "Membaca label (OCR)", en: "Reading label (OCR)" },
   { bm: "Rujuk silang MOH", en: "Cross-referencing MOH" },
   { bm: "Semak bahan tambahan", en: "Checking additives" },
 ] as const;
 
 const STEP_MS = 750; // ~2.2s total across 3 steps
 
-export function Analyzing({ onComplete }: { onComplete: () => void }) {
+export function Analyzing({
+  onComplete,
+  mode = "barcode",
+  waitFor,
+}: {
+  onComplete: () => void;
+  /** OCR mode leads with the "Reading label (OCR)" step. */
+  mode?: "barcode" | "ocr";
+  /**
+   * Optional gate: the loader animates its steps, but won't fire `onComplete`
+   * until this promise resolves (used by the OCR path to hold the un-redaction
+   * until the real vision+AI round-trip returns). Barcode path leaves it unset.
+   */
+  waitFor?: Promise<unknown>;
+}) {
   const reduceMotion = useReducedMotion();
+  const STEPS = mode === "ocr" ? OCR_STEPS : BARCODE_STEPS;
   const [step, setStep] = useState(0);
   const done = useRef(false);
 
   useEffect(() => {
-    // Reduced motion: advance instantly, fire onComplete on the next tick.
+    let cancelled = false;
+    const finishOnce = () => {
+      if (!done.current && !cancelled) {
+        done.current = true;
+        onComplete();
+      }
+    };
+    // Fire onComplete once the animation's minimum time AND (if given) the
+    // waitFor gate have both elapsed — so the OCR path holds until its real
+    // round-trip returns instead of racing ahead to a not-yet-cached page.
+    const gate = (minMs: number) => {
+      const timer = new Promise((r) => setTimeout(r, minMs));
+      Promise.all([timer, waitFor ?? Promise.resolve()])
+        .then(finishOnce)
+        .catch(finishOnce);
+    };
+
     if (reduceMotion) {
       setStep(STEPS.length - 1);
-      const t = setTimeout(() => {
-        if (!done.current) {
-          done.current = true;
-          onComplete();
-        }
-      }, 150);
-      return () => clearTimeout(t);
+      gate(150);
+      return () => {
+        cancelled = true;
+      };
     }
     const timers = STEPS.map((_, i) =>
       setTimeout(() => setStep(i), i * STEP_MS)
     );
-    const finish = setTimeout(() => {
-      if (!done.current) {
-        done.current = true;
-        onComplete();
-      }
-    }, STEPS.length * STEP_MS);
+    gate(STEPS.length * STEP_MS);
     return () => {
+      cancelled = true;
       timers.forEach(clearTimeout);
-      clearTimeout(finish);
     };
-  }, [reduceMotion, onComplete]);
+    // STEPS is derived from `mode` (stable per mount); waitFor is stable per mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduceMotion, onComplete, mode]);
 
   return (
     <motion.div
@@ -65,7 +98,7 @@ export function Analyzing({ onComplete }: { onComplete: () => void }) {
       className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-ink/95 px-8"
     >
       <span className="type-eyebrow mb-8 text-reveal">
-        MENGANALISIS · ANALYZING
+        {mode === "ocr" ? "MEMBACA LABEL · READING LABEL" : "MENGANALISIS · ANALYZING"}
       </span>
 
       {/* Forensic step column — token-native. */}

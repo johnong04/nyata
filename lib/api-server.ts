@@ -51,6 +51,45 @@ export async function getVerdictReal(barcode: string): Promise<Verdict> {
   return getVerdictEngine({ barcode });
 }
 
+/**
+ * OCR "snap the label" path. Takes a label photo (base64 data URL), derives a
+ * STABLE synthetic barcode from the bytes (`ocr-<hash>` — same photo → same
+ * barcode, so a re-snap reuses the cached verdict instead of re-billing OCR/AI),
+ * and runs the full engine with `labelPhoto` set. The engine OCRs the label →
+ * builds a `source:"ocr"` product → caches it under the synthetic barcode → AI
+ * verdict. Because the product is cached under that barcode, the existing
+ * `/product/<synthetic>` page resolves it on the follow-up navigation.
+ *
+ * Returns the synthetic barcode plus `ok`: `ok:false` means the engine could not
+ * read the label (no OCR key / unreadable photo / AI failure → stub verdict), so
+ * the client can surface a friendly "couldn't read the label" retry instead of
+ * routing into a dead-end product page. Never throws.
+ */
+export async function getVerdictFromPhoto(
+  dataUrl: string,
+): Promise<{ barcode: string; ok: boolean }> {
+  const barcode = syntheticBarcode(dataUrl);
+  try {
+    const verdict = await getVerdictEngine({ barcode, labelPhoto: dataUrl });
+    // A stub verdict (rating 5, zero flags) means OCR/AI didn't complete — the
+    // engine never caches stubs, so no product row exists to route to. Signal a
+    // friendly retry rather than a 404.
+    const ok = !(verdict.rating === 5 && verdict.flags.length === 0);
+    return { barcode, ok };
+  } catch {
+    return { barcode, ok: false };
+  }
+}
+
+/** Stable `ocr-<8-hex>` barcode from the photo bytes (djb2 — no crypto import). */
+function syntheticBarcode(dataUrl: string): string {
+  let h = 5381;
+  for (let i = 0; i < dataUrl.length; i++) {
+    h = ((h << 5) + h + dataUrl.charCodeAt(i)) | 0;
+  }
+  return "ocr-" + (h >>> 0).toString(16).padStart(8, "0");
+}
+
 /** Current user's profile, or null when guest / unauthenticated. */
 export async function getProfileReal(): Promise<Profile | null> {
   if (!isAuthConfigured()) return null;

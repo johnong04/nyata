@@ -38,6 +38,7 @@ import {
   getRecallsForProductReal,
   getProductByBarcodeReal,
   getVerdictReal,
+  getVerdictFromPhoto as getVerdictFromPhotoReal,
 } from "@/lib/api-server";
 
 // ---------------------------------------------------------------------------
@@ -148,6 +149,25 @@ export async function getVerdict(barcode: string): Promise<Verdict> {
         summary_bm: "Tiada maklumat tersedia untuk produk ini.",
         summary_en: "No information available for this product.",
       },
+  );
+}
+
+/**
+ * OCR "snap the label" fallback: OFF miss → read the label photo with Gemini
+ * vision → AI verdict, cached under a synthetic `ocr-<hash>` barcode. Purely a
+ * live path (there is no meaningful mock for an arbitrary user photo); on any
+ * failure the fallback reports `ok:false` so the caller shows a friendly retry
+ * rather than routing to a dead-end page. `dataUrl` is a base64 JPEG data URL,
+ * already downscaled client-side to keep the server-action payload small.
+ */
+export async function getVerdictFromPhoto(
+  dataUrl: string,
+): Promise<{ barcode: string; ok: boolean }> {
+  return withFallback(
+    () => getVerdictFromPhotoReal(dataUrl),
+    () => ({ barcode: "", ok: false }),
+    // OCR round-trip (vision + AI) is slower than a barcode lookup; give it room.
+    { timeoutMs: 20000 },
   );
 }
 

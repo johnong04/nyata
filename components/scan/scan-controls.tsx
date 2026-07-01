@@ -11,14 +11,52 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+/**
+ * SnapLabelButton — the OCR fallback trigger. A label-wrapped file input
+ * (`capture="environment"` opens the rear camera on mobile, falls back to the
+ * gallery/file picker elsewhere) so a product not in OpenFoodFacts can still be
+ * read off its printed ingredient list. Styled to match the mono control chrome.
+ */
+export function SnapLabelButton({
+  onLabelPhoto,
+  className = "",
+}: {
+  onLabelPhoto: (file: File) => void;
+  className?: string;
+}) {
+  return (
+    <label
+      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
+    >
+      <LabelIcon />
+      Imbas label · Snap the label
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="sr-only"
+        aria-label="Snap the product label"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          // Reset so re-picking the same file still fires onChange.
+          e.target.value = "";
+          if (file) onLabelPhoto(file);
+        }}
+      />
+    </label>
+  );
+}
+
 export function ScanControls({
   onBarcode,
+  onLabelPhoto,
   torchSupported,
   torchOn,
   onToggleTorch,
   autoFocusManual = false,
 }: {
   onBarcode: (barcode: string) => void;
+  onLabelPhoto: (file: File) => void;
   torchSupported: boolean;
   torchOn: boolean;
   onToggleTorch: () => void;
@@ -63,6 +101,9 @@ export function ScanControls({
         </form>
       )}
 
+      {/* Always-visible OCR escape hatch: works even when the barcode won't. */}
+      <SnapLabelButton onLabelPhoto={onLabelPhoto} className="w-full" />
+
       <div className="flex items-center justify-center gap-3">
         {!manualOpen && (
           <Button
@@ -103,8 +144,10 @@ export function ScanControls({
  */
 export function NoCameraFallback({
   onBarcode,
+  onLabelPhoto,
 }: {
   onBarcode: (barcode: string) => void;
+  onLabelPhoto: (file: File) => void;
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -149,7 +192,30 @@ export function NoCameraFallback({
           Hurai
         </Button>
       </form>
+
+      <span className="my-5 font-mono text-xs uppercase tracking-widest text-paper/40">
+        atau · or
+      </span>
+      <SnapLabelButton onLabelPhoto={onLabelPhoto} />
     </div>
+  );
+}
+
+function LabelIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden
+    >
+      <path d="M14.5 4h-5L4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9l-5.5-5Z" />
+      <path d="M9 13h6M9 17h6M9 9h1" />
+    </svg>
   );
 }
 

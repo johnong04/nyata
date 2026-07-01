@@ -11,13 +11,23 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getProductByBarcode } from "@/lib/api";
+import { getProductByBarcode, getVerdictFromPhoto } from "@/lib/api";
 import { makeDetector, detectBarcode } from "@/lib/barcode";
+import { fileToDownscaledDataUrl } from "@/lib/image";
 import { Reticle } from "@/components/scan/reticle";
 import { Analyzing } from "@/components/scan/analyzing";
 import { ScanControls, NoCameraFallback } from "@/components/scan/scan-controls";
+import { OcrFailed } from "@/components/scan/ocr-failed";
 
-type ScanState = "idle" | "scanning" | "analyzing" | "error";
+// idle → scanning → analyzing → route out. "reading" is the OCR twin of
+// "analyzing"; "ocr-failed" is its friendly retry dead-stop. "error" = no camera.
+type ScanState =
+  | "idle"
+  | "scanning"
+  | "analyzing"
+  | "reading"
+  | "ocr-failed"
+  | "error";
 
 const DETECT_INTERVAL_MS = 300;
 
@@ -32,6 +42,9 @@ export function ScanClient() {
   const [state, setState] = useState<ScanState>("idle");
   const [torchSupported, setTorchSupported] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
+  // The OCR round-trip promise the "reading" loader waits on, and where it lands.
+  const ocrRef = useRef<Promise<{ barcode: string; ok: boolean }> | null>(null);
+  const ocrResultRef = useRef<{ barcode: string; ok: boolean } | null>(null);
 
   /** Stop every media track and cancel the detection loop. Idempotent. */
   const stopCamera = useCallback(() => {
@@ -62,6 +75,46 @@ export function ScanClient() {
     const barcode = pendingBarcode.current;
     if (!barcode) return;
     router.push(`/product/${encodeURIComponent(barcode)}`);
+  }, [router]);
+
+  /**
+   * OCR fallback: user picks/snaps a label photo. Downscale it client-side,
+   * kick the vision+AI round-trip in parallel with the loader, then route to the
+   * synthetic product page — or, if the label was unreadable, drop to a friendly
+   * retry instead of a dead-end 404.
+   */
+  const onLabelPhoto = useCallback(
+    async (file: File) => {
+      if (state === "reading" || state === "analyzing") return;
+      stopCamera();
+      ocrResultRef.current = null;
+      // Start the (potentially slow) work now; the loader's waitFor gate holds
+      // the un-redaction until this settles.
+      const run = (async () => {
+        try {
+          const dataUrl = await fileToDownscaledDataUrl(file);
+          const res = await getVerdictFromPhoto(dataUrl);
+          ocrResultRef.current = res;
+          return res;
+        } catch {
+          const res = { barcode: "", ok: false };
+          ocrResultRef.current = res;
+          return res;
+        }
+      })();
+      ocrRef.current = run;
+      setState("reading");
+    },
+    [state, stopCamera],
+  );
+
+  const onReadComplete = useCallback(() => {
+    const res = ocrResultRef.current;
+    if (res?.ok && res.barcode) {
+      router.push(`/product/${encodeURIComponent(res.barcode)}`);
+    } else {
+      setState("ocr-failed");
+    }
   }, [router]);
 
   // Mount: request the camera.
@@ -165,6 +218,7 @@ export function ScanClient() {
           <Reticle />
           <ScanControls
             onBarcode={onBarcode}
+            onLabelPhoto={onLabelPhoto}
             torchSupported={torchSupported}
             torchOn={torchOn}
             onToggleTorch={toggleTorch}
@@ -172,9 +226,26 @@ export function ScanClient() {
         </>
       )}
 
-      {state === "error" && <NoCameraFallback onBarcode={onBarcode} />}
+      {state === "error" && (
+        <NoCameraFallback onBarcode={onBarcode} onLabelPhoto={onLabelPhoto} />
+      )}
 
       {state === "analyzing" && <Analyzing onComplete={onAnalyzeComplete} />}
+
+      {state === "reading" && (
+        <Analyzing
+          mode="ocr"
+          waitFor={ocrRef.current ?? undefined}
+          onComplete={onReadComplete}
+        />
+      )}
+
+      {state === "ocr-failed" && (
+        <OcrFailed
+          onRetry={() => setState("scanning")}
+          onLabelPhoto={onLabelPhoto}
+        />
+      )}
     </div>
   );
 }
