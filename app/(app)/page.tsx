@@ -1,32 +1,30 @@
-import Link from "next/link";
-import { ScanLine } from "lucide-react";
-import { RedactionDemo } from "@/components/nyata/redaction-demo";
+import { getLandingRecalls } from "@/lib/landing-data";
+import RecallTicker from "@/components/landing/recall-ticker";
+import Hero from "@/components/landing/hero";
+import NyataMethod from "@/components/landing/nyata-method";
+import LatestRecalls from "@/components/landing/latest-recalls";
+import PremiumCta from "@/components/landing/premium-cta";
 
-export default function HomePage() {
+/**
+ * Nyata landing / home — the public front door at `/`.
+ * Server component: fetches recalls once (official-source only) and hands them
+ * to the ticker + Latest Recalls list. Renders inside the (app) phone shell.
+ */
+export default async function HomePage() {
+  const recalls = await getLandingRecalls();
+
   return (
-    <div>
-      <header>
-        <p className="type-eyebrow">Digital whistleblower · Pemberi maklumat</p>
-        <h1 className="type-display mt-3 text-ink">
-          Scan the label.
-          <br />
-          See what&apos;s hidden.
-        </h1>
-        <p className="mt-4 max-w-prose text-ink-70">
-          Imbas produk Malaysia untuk putusan segera tentang bahan tambahan,
-          keraguan halal, dan penarikan balik rasmi.
-        </p>
-      </header>
+    <div className="-mt-8">
+      <div className="-mx-5">
+        <RecallTicker recalls={recalls} />
+      </div>
 
-      <Link
-        href="/scan"
-        className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-ink px-5 py-4 font-semibold text-paper transition-transform active:scale-[.98]"
-      >
-        <ScanLine className="h-5 w-5" />
-        Imbas produk · Scan a product
-      </Link>
-
-      <RedactionDemo />
+      <div className="mt-8">
+        <Hero />
+        <NyataMethod />
+        <LatestRecalls recalls={recalls} />
+        <PremiumCta />
+      </div>
     </div>
   );
 }
