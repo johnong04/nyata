@@ -1,8 +1,13 @@
 {
   "mcpServers": {
-    "shadcn": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=efrrrunfakoviyvgpqwg"
+    },
+    "magic": {
       "command": "cmd",
-      "args": ["/c", "npx", "shadcn@latest", "mcp"]
+      "args": ["/c", "npx", "-y", "@21st-dev/magic@latest"],
+      "env": { "API_KEY": "${MAGIC_API_KEY}" }
     }
   }
 }
