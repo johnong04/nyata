@@ -18,7 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { signInWithOtp, verifyOtp } from "@/app/(auth)/actions";
+import { signInWithGoogle, signInWithOtp, verifyOtp } from "@/app/(auth)/actions";
 import { isAuthConfigured } from "@/lib/auth-config";
 
 const COPY = {
@@ -46,6 +46,7 @@ const ERROR_COPY: Record<string, string> = {
   "invalid-code": "Kod salah atau tamat tempoh · Wrong or expired code",
   "otp-send-failed": "Gagal hantar kod. Cuba lagi · Couldn’t send code, try again",
   "auth-unconfigured": "Mod tetamu — log masuk dimatikan · Guest mode — sign-in off",
+  "oauth-unavailable": "Google tidak tersedia · Google unavailable",
   oauth: "Log masuk Google gagal · Google sign-in failed",
 };
 
@@ -105,6 +106,18 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
     setPending(false);
     if (res.ok) router.push(next);
     else setError(res.error);
+  };
+
+  const handleGoogle = async () => {
+    setError(null);
+    setPending(true);
+    const res = await signInWithGoogle();
+    if (res.ok) {
+      window.location.href = res.url; // hand off to Google (PKCE → /auth/callback)
+      return;
+    }
+    setPending(false);
+    setError(res.error);
   };
 
   return (
@@ -203,17 +216,17 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <span className="h-px flex-1 bg-line" />
       </div>
 
-      {/* Google provider is NOT enabled in Supabase yet → disabled "coming soon"
-          so it never hard-errors. Wire-through action exists for when it flips. */}
+      {/* Google OAuth (PKCE → /auth/callback). Enabled once the provider is on in
+          Supabase; guest mode (no env) disables it. */}
       <Button
         type="button"
         variant="outline"
-        disabled
-        title="Google sign-in coming soon"
-        className="h-11 gap-2 rounded-xl border-line bg-card text-ink-40 hover:bg-card disabled:opacity-100"
+        onClick={handleGoogle}
+        disabled={pending || !configured}
+        className="h-11 gap-2 rounded-xl border-line bg-card text-ink hover:bg-surface-2 disabled:opacity-60"
       >
         <GoogleG />
-        Google — Akan datang · Coming soon
+        Teruskan dengan Google · Continue with Google
       </Button>
 
       {!configured && (
