@@ -14,13 +14,42 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Product, Profile, Recall, Scan } from "@/lib/types";
+import type { Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
 import { recallsForProductFromRows } from "@/lib/recalls/getRecallsForProduct";
+import {
+  getProductByBarcode as getProductByBarcodeEngine,
+  getVerdict as getVerdictEngine,
+} from "@/lib/verdict";
 
 const ALLOWED_CONDITIONS = ["allergy", "diabetic", "pregnant", "kid"] as const;
+
+/**
+ * S13: server-boundary adapters for the verdict engine (`lib/verdict`, which is
+ * `server-only` — AI + service keys, must never reach the client bundle). The
+ * `lib/api.ts` seam is client-importable (scan-client prefetches
+ * getProductByBarcode), so it CANNOT import `lib/verdict` directly. It calls
+ * these `"use server"` actions instead; the seam wraps them in `withFallback`.
+ *
+ * Adaptation: the engine's `getVerdict` takes `{ barcode, labelPhoto? }` and
+ * returns `VerdictWithCopy` (a Verdict superset + disclaimer copy). The seam's
+ * contract is `getVerdict(barcode) → Verdict`; the superset satisfies it and the
+ * extra copy fields ride along harmlessly for callers that use them.
+ */
+
+/** Real product lookup (cache → OFF). Null = not found. Never throws. */
+export async function getProductByBarcodeReal(
+  barcode: string,
+): Promise<Product | null> {
+  return getProductByBarcodeEngine(barcode);
+}
+
+/** Real verdict (cache → OFF → AI; stub on any failure). Never throws. */
+export async function getVerdictReal(barcode: string): Promise<Verdict> {
+  return getVerdictEngine({ barcode });
+}
 
 /** Current user's profile, or null when guest / unauthenticated. */
 export async function getProfileReal(): Promise<Profile | null> {
