@@ -14,10 +14,11 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Profile, Scan } from "@/lib/types";
+import type { Product, Profile, Recall, Scan } from "@/lib/types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
+import { recallsForProductFromRows } from "@/lib/recalls/getRecallsForProduct";
 
 const ALLOWED_CONDITIONS = ["allergy", "diabetic", "pregnant", "kid"] as const;
 
@@ -94,6 +95,37 @@ export async function getScanHistoryReal(): Promise<Scan[] | null> {
       scanned_at: row.created_at,
     };
   });
+}
+
+/**
+ * Real recall cross-check (S11). DATA-INTEGRITY / DEFAMATION CRITICAL PATH
+ * (specs §6). Reads the PUBLIC-READ `recalls` table and runs the conservative,
+ * false-negative-biased matcher (lib/recalls/match.ts). Returns:
+ *   - null  -> real path unavailable (guest mode / no env); seam falls back to mock.
+ *   - []    -> real path ran, NO official recall matched (a legitimate answer);
+ *              seam renders "no official recalls found", never a fabrication.
+ *   - [...] -> matched official recalls, each carrying a live official_url.
+ * Any thrown error is swallowed to [] so the verdict page never crashes on this.
+ */
+export async function getRecallsForProductReal(
+  product: Product,
+): Promise<Recall[] | null> {
+  try {
+    const supabase = await createClient();
+    if (!supabase) return null; // guest mode / no auth env -> mock fallback
+    const { data, error } = await supabase
+      .from("recalls")
+      .select(
+        "source, match_barcode, match_brand, match_product, title, official_url, date, severity",
+      );
+    if (error || !data) return []; // query failed -> no accusation (NOT mock — table is authoritative)
+    return recallsForProductFromRows(
+      product,
+      data as unknown as Record<string, unknown>[],
+    );
+  } catch {
+    return []; // never crash the verdict on the recall read
+  }
 }
 
 /**

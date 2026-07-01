@@ -28,6 +28,7 @@ import {
   saveProfileReal,
   getScanHistoryReal,
   logScanReal,
+  getRecallsForProductReal,
 } from "@/lib/api-server";
 
 /** Simulate a tiny network hop so loading states are exercisable. */
@@ -56,8 +57,20 @@ export async function getVerdict(barcode: string): Promise<Verdict> {
 }
 
 export async function getRecallsForProduct(p: Product): Promise<Recall[]> {
-  // S13: swap to real backend behind try/catch → mock.
-  // Legal invariant: on any failure this falls back to [] — NEVER a fabricated recall.
+  // S11: real Supabase-backed conservative cross-check (public-read `recalls`),
+  // falling back to mock only when the real path is unavailable (guest mode /
+  // no env). Legal invariant: on any failure this yields [] — NEVER a fabricated
+  // recall, NEVER a false accusation. The matcher is false-negative biased.
+  try {
+    const real = await getRecallsForProductReal(p);
+    // real === null  -> real path unavailable (guest / no env): use mock fixtures.
+    // real === []    -> real path ran, no official recall matched: AUTHORITATIVE,
+    //                   do NOT fall through to mock (that would fabricate a hit).
+    // real === [...] -> matched official recalls.
+    if (real !== null) return real;
+  } catch {
+    // Backend error -> fall through to mock (still official-source fixtures only).
+  }
   return tick(MOCK_RECALLS[p.barcode] ?? NO_RECALLS);
 }
 
