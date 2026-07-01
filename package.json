@@ -12,6 +12,8 @@
     "@base-ui/react": "^1.6.0",
     "@radix-ui/react-tabs": "^1.1.16",
     "@react-three/fiber": "^9.6.1",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0",
     "@tabler/icons-react": "^3.44.0",
     "@vercel/og": "^0.11.1",
     "barcode-detector": "^3.2.0",
