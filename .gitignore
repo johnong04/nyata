@@ -32,6 +32,7 @@ tasks.md
 CLAUDE.md
 .claude/settings.local.json
 .claude.local.md
+.agents/
 
 # === OS / editor ===
 .DS_Store
