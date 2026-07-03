@@ -45,6 +45,8 @@ import {
   getVerdictFromPhotos as getVerdictFromPhotosReal,
   getDossierReal,
   getDossierCachedReal,
+  getFeedReal,
+  getFeedRecallsReal,
 } from "@/lib/api-server";
 
 // ---------------------------------------------------------------------------
@@ -205,9 +207,14 @@ export async function getRecallsForProduct(p: Product): Promise<Recall[]> {
 
 export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
   return withFallback(
-    // S13: awaiting S8 feed_items view — live path not yet built, keep mock as live
-    // so the flip is one line later. Wrapper is in place; behavior is identical.
-    () => mockFeed(filter),
+    // Live: S7 feed_items view via the server-action boundary. null (guest / no
+    // env / query error) -> illustrative mock feed; live rows (incl. empty for
+    // the recalled filter) are authoritative.
+    async () => {
+      const real = await getFeedReal(filter);
+      if (real !== null) return real;
+      return mockFeed(filter);
+    },
     () => {
       // Synchronous mock (fallback path can't await tick; identical ordering).
       const items = [...MOCK_FEED];
@@ -253,8 +260,13 @@ async function mockFeed(filter: FeedFilter): Promise<FeedItem[]> {
  */
 export async function getFeedRecalls(): Promise<Recall[]> {
   return withFallback(
-    // S13: awaiting S11 feed-recall query — mock-as-live for now, filter preserved.
-    () => tick(MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url))),
+    // Live: S7 recalls read via the server-action boundary. Fails closed upstream
+    // (drops any row missing official_url). null -> official-source fixtures.
+    async () => {
+      const real = await getFeedRecallsReal();
+      if (real !== null) return real;
+      return MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url));
+    },
     () => MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url)),
   );
 }

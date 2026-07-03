@@ -14,12 +14,27 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Dossier, Member, Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
+import type {
+  Dossier,
+  FeedFilter,
+  FeedItem,
+  Member,
+  Product,
+  Profile,
+  Recall,
+  Scan,
+  Verdict,
+  VerdictBand,
+} from "@/lib/types";
 import type { Json } from "@/utils/supabase/database.types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
-import { recallsForProductFromRows } from "@/lib/recalls/getRecallsForProduct";
+import {
+  recallsForProductFromRows,
+  toRecall,
+  toRow,
+} from "@/lib/recalls/getRecallsForProduct";
 import {
   getProductByBarcode as getProductByBarcodeEngine,
   getVerdict as getVerdictEngine,
@@ -281,4 +296,74 @@ export async function logScanReal(barcode: string): Promise<boolean> {
   // A FK violation (product not yet cached) just means no history row — never
   // block the verdict. Fail soft.
   return !error;
+}
+
+/**
+ * Live "Hidden Ingredients" feed (S7). Reads the public `feed_items` view
+ * (products join verdicts, aligned to FeedItem). Per-filter ordering is applied
+ * here; the view's built-in ORDER BY is a harmless default. Returns:
+ *   - null  -> client unavailable (no auth env) or query error -> seam -> mock.
+ *   - [...] -> authoritative live rows (may be empty for the recalled filter).
+ * Feed data is verdict-derived (ingredient-only, self-authored) — no legal
+ * fabrication concern, so empty is a valid answer, not a mock trigger.
+ */
+export async function getFeedReal(
+  filter: FeedFilter,
+): Promise<FeedItem[] | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  let q = supabase
+    .from("feed_items")
+    .select("barcode, name, brand, band, rating, flagged_count, recalled, scanned_at");
+
+  if (filter === "recalled") q = q.eq("recalled", true);
+  q =
+    filter === "newest"
+      ? q.order("scanned_at", { ascending: false })
+      : q.order("rating", { ascending: false }); // worst + recalled lead by rating
+
+  const { data, error } = await q.limit(50);
+  if (error || !data) return null;
+
+  return data.map((row) => {
+    const rating = Number(row.rating);
+    return {
+      barcode: String(row.barcode),
+      name: (row.name as string | null) ?? String(row.barcode),
+      brand: (row.brand as string | null) ?? "",
+      band: ((row.band as VerdictBand | null) ?? bandForRating(rating)) as VerdictBand,
+      rating,
+      flagged_count: Number(row.flagged_count ?? 0),
+      recalled: Boolean(row.recalled),
+      scanned_at: String(row.scanned_at),
+    };
+  });
+}
+
+/**
+ * Live official recalls for the community feed (S7). DATA-INTEGRITY / DEFAMATION
+ * CRITICAL PATH (specs §6): republishes official-source rows only. FAILS CLOSED —
+ * any row missing `official_url` is dropped, never rendered. Returns:
+ *   - null  -> unavailable/error -> seam falls back to official-source fixtures.
+ *   - [...] -> official recalls, newest first, each carrying a live official_url.
+ */
+export async function getFeedRecallsReal(): Promise<Recall[] | null> {
+  try {
+    const supabase = await createClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from("recalls")
+      .select(
+        "source, match_barcode, match_brand, match_product, title, official_url, date, severity",
+      )
+      .order("date", { ascending: false })
+      .limit(20);
+    if (error || !data) return null;
+    return data
+      .map((r) => toRecall(toRow(r as unknown as Record<string, unknown>)))
+      .filter((r) => Boolean(r.official_url));
+  } catch {
+    return null;
+  }
 }
