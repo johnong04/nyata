@@ -1,0 +1,24 @@
+{
+  "reachable": false,
+  "reason": "MOH FSQ food recall NOT extractable via the mapped candidate URLs. fsq.moh.gov.my is DNS-dead (NXDOMAIN); hq.moh.gov.my/fsq times out; www.moh.gov.my division page IS reachable (stealth 200) but is a programme-description page with NO recall listing. MOH food recalls surface as FoSIM entries / news posts / PDF circulars — no clean public HTML recall table exists. S6 has NO MOH seed fallback -> MOH coverage is ABSENT (flagged, never fabricated).",
+  "degrade_to_seeds": true,
+  "candidates_probed": {
+    "https://fsq.moh.gov.my": {
+      "requests+parser": "no recall row",
+      "scrapling-fetcher": "no recall row",
+      "scrapling-stealthy": "no recall row"
+    },
+    "https://hq.moh.gov.my/fsq": {
+      "requests+parser": "no recall row",
+      "scrapling-fetcher": "no recall row",
+      "scrapling-stealthy": "no recall row"
+    },
+    "https://www.moh.gov.my/en/corporate-info/division-information/food-safety-and-quality-programme": {
+      "requests+parser": "no recall row",
+      "scrapling-fetcher": "no recall row",
+      "scrapling-stealthy": "no recall row"
+    }
+  },
+  "S6_DEGRADE_MOH": true,
+  "needs_new_target": true
+}
