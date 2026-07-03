@@ -4,6 +4,7 @@ import {
   getVerdict,
   getRecallsForProduct,
   getDossierCached,
+  getProfile,
   logScan,
 } from "@/lib/api";
 import { VerdictDetail } from "@/components/nyata/verdict-detail";
@@ -20,10 +21,11 @@ export default async function ProductPage({
   // Log the scan for signed-in users (users metric). No-op for guests; never
   // blocks the verdict — logScan swallows its own errors.
   await logScan(barcode);
-  const [verdict, recalls, dossier] = await Promise.all([
+  const [verdict, recalls, dossier, profile] = await Promise.all([
     getVerdict(barcode),
     getRecallsForProduct(product),
     getDossierCached({ brand: product.brand, name: product.name }),
+    getProfile(),
   ]);
   return (
     <div className="bg-paper">
@@ -33,6 +35,8 @@ export default async function ProductPage({
         verdict={verdict}
         recalls={recalls}
         dossier={dossier}
+        members={profile.members}
+        isPremium={profile.is_premium}
       />
     </div>
   );

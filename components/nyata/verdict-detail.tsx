@@ -11,13 +11,13 @@
  */
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { Product, Verdict, Recall, Dossier } from "@/lib/types";
+import type { Product, Verdict, Recall, Dossier, Member } from "@/lib/types";
 import { RedactionBar } from "@/components/nyata/redaction-bar";
 import { VerdictStamp } from "@/components/nyata/verdict-stamp";
 import { HazardPanel } from "@/components/nyata/hazard-panel";
 import { RecallBlock } from "@/components/nyata/recall-block";
 import { OnTheRecord } from "@/components/nyata/on-the-record";
-import { PremiumUpsell } from "@/components/nyata/premium-upsell";
+import { PersonalRiskSection } from "@/components/nyata/personal-risk";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
@@ -29,11 +29,15 @@ export function VerdictDetail({
   verdict,
   recalls,
   dossier,
+  members,
+  isPremium,
 }: {
   product: Product;
   verdict: Verdict;
   recalls: Recall[];
   dossier: Dossier | null;
+  members: Member[];
+  isPremium: boolean;
 }) {
   // The un-redaction: bar covers hazards, wipes on mount (~450ms). The
   // RedactionBar primitive owns the reduced-motion floor (cross-fade), but we
@@ -85,14 +89,19 @@ export function VerdictDetail({
         <HazardPanel flags={verdict.flags} />
       </RedactionBar>
 
+      {/* Scan-time "who's this for?" — re-flags this verdict per member (§11.5).
+          Premium-gated behind the stub unlock; replaces the inert PremiumUpsell. */}
+      <PersonalRiskSection
+        verdict={verdict}
+        members={members}
+        isPremium={isPremium}
+      />
+
       {/* Official recall — renders nothing when there are none. */}
       <RecallBlock recalls={recalls} />
 
       {/* On the record — attributed third-party reports (never affects the verdict). */}
       <OnTheRecord product={product} initialDossier={dossier} />
-
-      {/* Premium upsell — risks stay redacted. */}
-      <PremiumUpsell />
 
       {/* Share → S4 flat share export flow. */}
       <Link
