@@ -1,6 +1,8 @@
-# scraper/requirements.txt — S3 spike deps (Python >=3.10)
-scrapling>=0.4,<0.5
-requests
-selectolax
-# Firecrawl fallback (uncomment only if scripting rung 4; else use the firecrawl-scrape skill):
-# firecrawl-py
+# scraper/requirements.txt — S6 recall scraper (Python >=3.10)
+# Green path per S3 spike (SPIKE_REPORT.md): requests + selectolax (no browser).
+scrapling>=0.4,<0.5     # kept per pinned stack; escalation-only (S3 green path is static)
+requests>=2.31,<3
+selectolax              # HTML parser used on the static green path (S3)
+supabase>=2.7,<3        # service-key upsert into `recalls`
+python-dotenv>=1.0,<2   # loads .env.local (URL + SUPABASE_SECRET_KEY)
+pytest>=8,<9            # offline parser/normalize/record tests
