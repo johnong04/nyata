@@ -1,7 +1,7 @@
 import "server-only";
 import type { Product } from "@/lib/types";
 import { fetchFromOFF } from "./off";
-import { ocrIngredients } from "./ocr";
+import { ocrLabel } from "./ocr";
 import { generateVerdict, MODEL_ID } from "./ai";
 import {
   getCachedProduct,
@@ -47,19 +47,27 @@ export async function getProductByBarcode(barcode: string): Promise<Product | nu
  */
 export async function getVerdict(input: {
   barcode: string;
-  labelPhoto?: string;
+  labelPhoto?: string; // back of pack — ingredients (may also carry the name)
+  frontPhoto?: string; // front of pack — name + brand
 }): Promise<VerdictWithCopy> {
-  const { barcode, labelPhoto } = input;
+  const { barcode, labelPhoto, frontPhoto } = input;
 
-  // 1. Resolve the product (cache → OFF → OCR fallback on a label photo).
+  // 1. Resolve the product (cache → OFF → OCR the photo(s)).
   let product = await getProductByBarcode(barcode);
-  if (!product && labelPhoto) {
-    const ingredients = await ocrIngredients(labelPhoto);
-    if (ingredients) {
+  if (!product && (labelPhoto || frontPhoto)) {
+    const back = labelPhoto ? await ocrLabel(labelPhoto) : null;
+    const front = frontPhoto ? await ocrLabel(frontPhoto) : null;
+    // Front wins for name/brand (that's its job); back wins for ingredients.
+    const name = front?.name || back?.name || "";
+    const brand = front?.brand || back?.brand || "";
+    const ingredients = back?.ingredients || front?.ingredients || "";
+    // A name OR ingredients is enough to anchor the product under this barcode —
+    // the barcode is the identity even when OFF had nothing (§11.4).
+    if (name || ingredients) {
       product = {
         barcode,
-        name: "",
-        brand: "",
+        name,
+        brand,
         ingredients_raw: ingredients,
         source: "ocr",
         cached_at: new Date().toISOString(),
