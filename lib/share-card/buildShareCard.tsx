@@ -34,7 +34,7 @@ const MONO = "Space Mono";
 const DISPLAY = "Bricolage Grotesque";
 
 export function buildShareCard(data: ShareCardData): ReactElement {
-  const { barcode, productName, brand, verdict, recall } = data;
+  const { barcode, productName, brand, verdict, recall, onTheRecord } = data;
   const v = ratingToVerdict(verdict.rating);
   const color = verdictColor(v.token);
   const colorBg = verdictColorBg(v.token);
@@ -114,6 +114,25 @@ export function buildShareCard(data: ShareCardData): ReactElement {
         >
           DECLASSIFIED
         </div>
+        {onTheRecord ? (
+          <div
+            style={{
+              display: "flex",
+              position: "absolute",
+              top: 132,
+              right: 56,
+              border: `3px solid ${REVEAL}`,
+              color: REVEAL,
+              fontFamily: MONO,
+              fontWeight: 700,
+              fontSize: 20,
+              letterSpacing: "0.12em",
+              padding: "6px 14px",
+            }}
+          >
+            ON THE RECORD
+          </div>
+        ) : null}
       </div>
 
       {/* 2 — ONE redaction bar frozen mid-lift (THE SIGNATURE). The ink bar

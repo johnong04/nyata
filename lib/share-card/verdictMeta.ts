@@ -103,4 +103,5 @@ export interface ShareCardData {
   brand: string;
   verdict: Verdict;
   recall: Recall | null;
+  onTheRecord?: boolean; // a gated dossier exists for this brand
 }
