@@ -2,6 +2,8 @@ import "server-only";
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import type { Product } from "@/lib/types";
+import { getHazards } from "@/lib/hazards/store";
+import { normalize } from "@/lib/recalls/normalize";
 import { verdictModelSchema, type VerdictModel } from "./schema";
 
 /**
@@ -38,13 +40,39 @@ RULES:
 - "summary_en" and "summary_bm": one or two plain sentences. Factual, neutral, not diagnostic.
 - Return ONLY fields defined by the schema. No extra keys.`;
 
+/** Hazard rows whose ingredient/alias literally appears in the product's ingredients. */
+function groundingRows(product: Product) {
+  const hay = normalize(product.ingredients_raw);
+  if (!hay) return [];
+  return getHazards().filter((h) =>
+    [h.ingredient, ...h.aliases].some((n) => {
+      const k = normalize(n);
+      return k.length > 2 && hay.includes(k);
+    }),
+  );
+}
+
 function buildPrompt(product: Product): string {
+  const grounded = groundingRows(product);
+  const groundingBlock =
+    grounded.length === 0
+      ? ""
+      : [
+          "",
+          "KNOWN REGULATORY FACTS for ingredients in THIS product (authoritative — use them; do not contradict):",
+          ...grounded.map(
+            (h) =>
+              `- ${h.ingredient}${h.e_number ? ` (${h.e_number})` : ""}: ${h.classification} — ${h.authority}. ${h.jurisdiction}`,
+          ),
+        ].join("\n");
+
   return [
     `Product: ${product.name || "(unknown)"}`,
     `Brand: ${product.brand || "(unknown)"}`,
     `Ingredients: ${product.ingredients_raw || "(none provided)"}`,
+    groundingBlock,
     "",
-    "Analyse the ingredients and return the verdict object.",
+    "Analyse the ingredients and return the verdict object. When a known regulatory fact above applies to an ingredient, FLAG that ingredient (matching name/e_number) so its citation can be attached.",
   ].join("\n");
 }
 
