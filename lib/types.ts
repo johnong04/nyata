@@ -23,6 +23,20 @@ export type FlagKind =
 
 export type Severity = "low" | "med" | "high";
 
+/**
+ * A verified cross-jurisdiction citation attached to a flag from the B1
+ * ingredient-hazard table. NEVER model-authored: the model writes the flag
+ * note/severity; this citation is attached deterministically from the verified
+ * table (specs §11.3) — same guardrail philosophy as the legal disclaimer copy.
+ */
+export interface JurisdictionFlag {
+  authority: string;      // e.g. "EFSA"
+  jurisdiction: string;   // e.g. "Permitted in Malaysia; banned in the EU (2022)"
+  status: string;         // classification, e.g. "possible carcinogen (IARC 2B)"
+  verbatim_quote: string; // exact text present at source_url
+  source_url: string;     // live, verified link
+}
+
 export interface Flag {
   e_number?: string;
   name: string;
@@ -30,6 +44,8 @@ export interface Flag {
   note_bm: string;
   note_en: string;
   severity: Severity;
+  /** Verified regulatory citation (B1). Attached post-validation, never persisted from the model. */
+  jurisdiction?: JurisdictionFlag;
 }
 
 export interface Verdict {
