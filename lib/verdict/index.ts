@@ -11,6 +11,8 @@ import {
 } from "./cache";
 import { withDisclaimers } from "./copy";
 import { stubVerdict } from "./stub";
+import { enrichFlagsWithJurisdiction } from "@/lib/hazards/enrich";
+import { getHazards } from "@/lib/hazards/store";
 import type { VerdictWithCopy } from "./types";
 
 /**
@@ -87,8 +89,13 @@ export async function getVerdict(input: {
   // 4. Generate + validate. On any failure, stub (never persist an invalid one).
   try {
     const model = await generateVerdict(product);
-    await upsertVerdict(barcode, model, MODEL_ID);
-    return withDisclaimers(model);
+    // Attach verified B1 citations to matching flags (never changes rating).
+    const enriched = {
+      ...model,
+      flags: enrichFlagsWithJurisdiction(model.flags, getHazards()),
+    };
+    await upsertVerdict(barcode, enriched, MODEL_ID);
+    return withDisclaimers(enriched);
   } catch (err) {
     console.warn("[verdict] generation failed, returning stub:", err);
     return stubVerdict("ai-failed");
