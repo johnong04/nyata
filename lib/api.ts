@@ -18,6 +18,7 @@ import type {
   Dossier,
   FeedFilter,
   FeedItem,
+  Member,
   Product,
   Profile,
   Recall,
@@ -34,6 +35,8 @@ import { MOCK_PROFILE } from "@/lib/mock/profile";
 import {
   getProfileReal,
   saveProfileReal,
+  saveMembersReal,
+  setPremiumStubReal,
   getScanHistoryReal,
   logScanReal,
   getRecallsForProductReal,
@@ -293,6 +296,32 @@ export async function saveProfile(conditions: string[]): Promise<void> {
     },
     () => {
       MOCK_PROFILE.conditions = conditions;
+    },
+  );
+}
+
+/** Persist this user's members (self + kids); guest → in-memory for the session. */
+export async function saveMembers(members: Member[]): Promise<void> {
+  await withFallback(
+    async () => {
+      const ok = await saveMembersReal(members);
+      if (!ok) MOCK_PROFILE.members = members; // guest/unconfigured → in-memory
+    },
+    () => {
+      MOCK_PROFILE.members = members;
+    },
+  );
+}
+
+/** Stub premium unlock — no payment (§11.5). Persists is_premium for the session. */
+export async function setPremiumStub(on: boolean): Promise<void> {
+  await withFallback(
+    async () => {
+      const ok = await setPremiumStubReal(on);
+      if (!ok) MOCK_PROFILE.is_premium = on;
+    },
+    () => {
+      MOCK_PROFILE.is_premium = on;
     },
   );
 }

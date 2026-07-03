@@ -88,9 +88,46 @@ export interface Scan {
   scanned_at: string; // ISO
 }
 
+/** Closed personalization vocabulary — template chips only, no free-text (§11.5). */
+export type PersonalCondition =
+  | "diabetic"
+  | "pregnant"
+  | "kid"
+  | "nuts"
+  | "dairy"
+  | "gluten"
+  | "soy"
+  | "shellfish"
+  | "hbp";
+
+/** Chip labels (BM · EN) — the single source for every condition-chip UI. */
+export const PERSONAL_CONDITIONS: {
+  value: PersonalCondition;
+  bm: string;
+  en: string;
+}[] = [
+  { value: "diabetic", bm: "Kencing manis", en: "Diabetic" },
+  { value: "pregnant", bm: "Mengandung", en: "Pregnant" },
+  { value: "kid", bm: "Untuk anak", en: "For kid" },
+  { value: "nuts", bm: "Kacang", en: "Nuts" },
+  { value: "dairy", bm: "Tenusu", en: "Dairy" },
+  { value: "gluten", bm: "Gluten", en: "Gluten" },
+  { value: "soy", bm: "Soya", en: "Soy" },
+  { value: "shellfish", bm: "Kerang", en: "Shellfish" },
+  { value: "hbp", bm: "Darah tinggi", en: "High BP" },
+];
+
+/** A person you buy for — self or a kid. Stored in profiles.members (jsonb). */
+export interface Member {
+  id: string;
+  name: string;
+  conditions: PersonalCondition[];
+}
+
 export interface Profile {
-  conditions: string[];
+  conditions: string[]; // legacy self-conditions (S13); superseded by members
   is_premium: boolean;
+  members: Member[];
 }
 
 /** One attributed source card in a dossier (§11.2: named source + working link). */

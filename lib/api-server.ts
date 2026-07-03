@@ -14,7 +14,8 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Dossier, Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
+import type { Dossier, Member, Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
+import type { Json } from "@/utils/supabase/database.types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
@@ -127,11 +128,15 @@ export async function getProfileReal(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("conditions, is_premium")
+    .select("conditions, is_premium, members")
     .eq("id", user.id)
     .maybeSingle();
   if (error || !data) return null;
-  return { conditions: data.conditions ?? [], is_premium: data.is_premium };
+  return {
+    conditions: data.conditions ?? [],
+    is_premium: data.is_premium,
+    members: (data.members as unknown as Member[]) ?? [],
+  };
 }
 
 /** Update own conditions. Session-derived id; unknown conditions filtered out. */
@@ -153,6 +158,41 @@ export async function saveProfileReal(conditions: string[]): Promise<boolean> {
     .from("profiles")
     .update({ conditions: clean })
     .eq("id", user.id); // RLS also enforces this; belt-and-braces.
+  return !error;
+}
+
+/** Persist this user's members list (self + kids). Session-derived id. */
+export async function saveMembersReal(members: Member[]): Promise<boolean> {
+  if (!isAuthConfigured()) return false;
+  const supabase = await createClient();
+  if (!supabase) return false;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { error } = await supabase
+    .from("profiles")
+    .update({ members: members as unknown as Json })
+    .eq("id", user.id); // RLS also enforces owner-only.
+  return !error;
+}
+
+/**
+ * STUB premium unlock (§11.5). Flips is_premium with NO payment — real
+ * ToyyibPay/Stripe is a later run (tasks.md Deferred → S12 payments). Session-derived id.
+ */
+export async function setPremiumStubReal(on: boolean): Promise<boolean> {
+  if (!isAuthConfigured()) return false;
+  const supabase = await createClient();
+  if (!supabase) return false;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_premium: on })
+    .eq("id", user.id);
   return !error;
 }
 

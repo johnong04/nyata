@@ -136,18 +136,21 @@ export type Database = {
           created_at: string
           id: string
           is_premium: boolean
+          members: Json
         }
         Insert: {
           conditions?: string[]
           created_at?: string
           id: string
           is_premium?: boolean
+          members?: Json
         }
         Update: {
           conditions?: string[]
           created_at?: string
           id?: string
           is_premium?: boolean
+          members?: Json
         }
         Relationships: []
       }
