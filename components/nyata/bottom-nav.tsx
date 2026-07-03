@@ -12,7 +12,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { House, Rss, ScanLine, History, User } from "lucide-react";
+import { DUR, EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type Tab = {
@@ -36,6 +38,7 @@ function isActive(pathname: string, href: string) {
 
 export function BottomNav() {
   const pathname = usePathname();
+  const reduce = useReducedMotion();
 
   return (
     <nav
@@ -56,14 +59,16 @@ export function BottomNav() {
                 aria-label={tab.label}
                 className="relative -mt-6 flex w-1/5 flex-col items-center gap-1"
               >
-                <span
+                <motion.span
+                  whileTap={reduce ? undefined : { scale: 0.9 }}
+                  transition={{ duration: DUR.micro, ease: EASE.out }}
                   className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-full bg-ink text-paper shadow-[0_6px_20px_rgba(23,20,15,.35)] transition-transform active:scale-95",
+                    "flex h-14 w-14 items-center justify-center rounded-full bg-ink text-paper shadow-[0_6px_20px_rgba(23,20,15,.35)]",
                     active && "ring-2 ring-reveal ring-offset-2 ring-offset-card"
                   )}
                 >
                   <Icon className="h-6 w-6" strokeWidth={2.25} />
-                </span>
+                </motion.span>
                 <span className="type-eyebrow text-[0.6rem] text-ink">
                   {tab.label}
                 </span>
@@ -79,20 +84,41 @@ export function BottomNav() {
               aria-current={active ? "page" : undefined}
               className="flex w-1/5 flex-col items-center gap-1 py-1"
             >
-              <Icon
-                className={cn(
-                  "h-5 w-5 transition-colors",
-                  active ? "text-ink" : "text-ink-40"
-                )}
-                strokeWidth={active ? 2.25 : 1.75}
-              />
-              <span
-                className={cn(
-                  "type-eyebrow text-[0.6rem] transition-colors",
-                  active ? "text-ink" : "text-ink-40"
-                )}
+              <motion.span
+                whileTap={reduce ? undefined : { scale: 0.88 }}
+                transition={{ duration: DUR.micro, ease: EASE.out }}
+                className="flex flex-col items-center gap-1"
               >
-                {tab.label}
+                <Icon
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    active ? "text-ink" : "text-ink-40"
+                  )}
+                  strokeWidth={active ? 2.25 : 1.75}
+                />
+                <span
+                  className={cn(
+                    "type-eyebrow text-[0.6rem] transition-colors",
+                    active ? "text-ink" : "text-ink-40"
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </motion.span>
+              {/* Turmeric active indicator — slides between tabs (shared-layout).
+                  Reduced-motion → it jumps (transition duration 0), no slide. */}
+              <span className="relative h-1 w-1">
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    transition={
+                      reduce
+                        ? { duration: 0 }
+                        : { type: "spring", bounce: 0.2, duration: 0.5 }
+                    }
+                    className="absolute inset-0 rounded-full bg-reveal"
+                  />
+                )}
               </span>
             </Link>
           );

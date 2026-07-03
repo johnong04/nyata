@@ -19,6 +19,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { FeedFilter, FeedItem, Recall } from "@/lib/types";
 import { getFeed, getFeedRecalls } from "@/lib/api";
 import { RatingStamp } from "@/components/nyata/rating-stamp";
+import { DUR, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type Chip = { value: FeedFilter; label: string; sub: string };
@@ -128,16 +129,6 @@ export function FeedList({
   );
 }
 
-/** Fade-up stagger 40ms (design-system §7); instant under reduced motion. */
-function stagger(index: number, reduce: boolean | null) {
-  if (reduce) return { initial: false as const };
-  return {
-    initial: { opacity: 0, y: 12 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.28, delay: index * 0.04, ease: "easeOut" as const },
-  };
-}
-
 function ProductCard({
   item,
   index,
@@ -149,7 +140,7 @@ function ProductCard({
 }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <motion.div {...stagger(index, reduce)} className="relative">
+    <motion.div {...fadeUp(index, reduce)} className="relative">
       <Link
         href={`/product/${item.barcode}`}
         onMouseEnter={() => setHovered(true)}
@@ -162,8 +153,8 @@ function ProductCard({
               layoutId="feed-hover"
               className="absolute inset-0 -z-0 block rounded-2xl bg-surface-2"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.15 } }}
-              exit={{ opacity: 0, transition: { duration: 0.15, delay: 0.1 } }}
+              animate={{ opacity: 1, transition: { duration: DUR.micro } }}
+              exit={{ opacity: 0, transition: { duration: DUR.micro, delay: 0.1 } }}
             />
           )}
         </AnimatePresence>
@@ -218,7 +209,7 @@ function RecallCard({
 }) {
   return (
     <motion.a
-      {...stagger(index, reduce)}
+      {...fadeUp(index, reduce)}
       href={recall.official_url}
       target="_blank"
       rel="noopener noreferrer"

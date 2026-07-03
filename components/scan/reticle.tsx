@@ -12,6 +12,7 @@
  * `prefers-reduced-motion` holds the scan-line static (§7 floor).
  */
 import { motion, useReducedMotion } from "motion/react";
+import { DUR, EASE } from "@/lib/motion";
 
 export function Reticle() {
   const reduceMotion = useReducedMotion();
@@ -27,11 +28,20 @@ export function Reticle() {
         className="relative aspect-square w-[68vw] max-w-[300px]"
         style={{ boxShadow: "0 0 0 100vmax rgba(23,20,15,0.62)" }}
       >
-        {/* Four L-brackets — square corners, turmeric reveal ink. */}
-        <Bracket className="left-0 top-0 border-l-2 border-t-2" />
-        <Bracket className="right-0 top-0 border-r-2 border-t-2" />
-        <Bracket className="bottom-0 left-0 border-b-2 border-l-2" />
-        <Bracket className="bottom-0 right-0 border-b-2 border-r-2" />
+        {/* Four L-brackets — square corners, turmeric reveal ink. They frame-in
+            on mount (scale-in, DUR.base) so the guide feels like it locks on. */}
+        <motion.div
+          aria-hidden
+          className="absolute inset-0"
+          initial={reduceMotion ? false : { opacity: 0, scale: 1.08 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: DUR.base, ease: EASE.out }}
+        >
+          <Bracket className="left-0 top-0 border-l-2 border-t-2" />
+          <Bracket className="right-0 top-0 border-r-2 border-t-2" />
+          <Bracket className="bottom-0 left-0 border-b-2 border-l-2" />
+          <Bracket className="bottom-0 right-0 border-b-2 border-r-2" />
+        </motion.div>
 
         {/* Green scan-line sweeping inside the target. */}
         <div className="absolute inset-0 overflow-hidden">
@@ -51,7 +61,7 @@ export function Reticle() {
                     duration: 1.8,
                     repeat: Infinity,
                     repeatType: "reverse",
-                    ease: "linear",
+                    ease: EASE.inOut,
                   }
             }
           />
