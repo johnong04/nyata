@@ -10,7 +10,7 @@
 
 import type { Profile } from "@/lib/types";
 import { RedactionBar } from "@/components/nyata/redaction-bar";
-import { ConditionToggles } from "./condition-toggles";
+import { MembersPanel } from "./members-panel";
 import { PremiumBadge } from "./premium-badge";
 
 const RISK_FLAGS = [
@@ -29,7 +29,7 @@ export function ProfilePanel({ initial }: { initial: Profile }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <ConditionToggles initial={initial.conditions} />
+      <MembersPanel initial={initial.members} />
 
       <PremiumBadge isPremium={isPremium} />
 
