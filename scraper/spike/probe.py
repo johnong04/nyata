@@ -25,7 +25,13 @@ def is_official(url: str) -> bool:
 def fetch_static(url: str):
     try:
         r = requests.get(url, headers={"User-Agent": UA}, timeout=30)
-        return r.text if r.status_code == 200 else None
+        if r.status_code != 200:
+            return None
+        # Prefer the page's declared/apparent charset so verbatim titles keep
+        # their real characters (registered marks, BM diacritics) instead of
+        # mojibake — the title is legally load-bearing (must be the source's words).
+        r.encoding = r.apparent_encoding or "utf-8"
+        return r.text
     except Exception as e:
         print(f"[static] {url} failed: {e}")
         return None
