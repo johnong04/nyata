@@ -58,7 +58,7 @@ export default function Hero() {
         <div className="mt-1 flex w-full max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/scan"
-            className="flex items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-semibold text-paper transition-transform active:scale-[.98]"
+            className="flex items-center justify-center rounded-xl bg-ink px-6 py-3.5 font-semibold text-paper ring-1 ring-reveal ring-offset-2 ring-offset-paper transition-transform active:scale-[.98]"
           >
             Start Scanning
           </Link>

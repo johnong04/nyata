@@ -34,7 +34,11 @@ export function ProfilePanel({ initial }: { initial: Profile }) {
       <PremiumBadge isPremium={isPremium} />
 
       <section className="flex flex-col gap-3">
-        <p className="type-eyebrow">FLAG RISIKO PERIBADI · PERSONAL RISK FLAGS</p>
+        <p className="type-eyebrow flex items-center gap-2">
+          {/* Turmeric marker — the S8 activation accent, consistent with chips/CTAs. */}
+          <span aria-hidden className="inline-block h-2 w-2 shrink-0 bg-reveal" />
+          FLAG RISIKO PERIBADI · PERSONAL RISK FLAGS
+        </p>
         <div className="flex flex-col gap-2">
           {RISK_FLAGS.map((f, i) =>
             isPremium ? (

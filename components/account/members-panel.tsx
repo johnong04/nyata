@@ -91,9 +91,10 @@ export function MembersPanel({ initial }: { initial: Member[] }) {
                   aria-pressed={active}
                   onClick={() => toggle(m.id, o.value)}
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                    "rounded-full px-3 py-1.5 text-sm font-medium transition-[color,background-color,box-shadow] duration-150",
+                    // Turmeric keyline-ring = activation (the S8 accent affordance).
                     active
-                      ? "bg-ink text-paper"
+                      ? "bg-ink text-paper ring-1 ring-reveal ring-offset-1 ring-offset-card"
                       : "bg-surface-2 text-ink-70 hover:bg-line",
                   )}
                 >

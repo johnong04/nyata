@@ -108,7 +108,8 @@ export function VerdictDetail({
         href={`/share/${product.barcode}`}
         className={cn(
           buttonVariants(),
-          "h-11 w-full rounded-xl bg-ink text-paper hover:bg-ink/90"
+          // Turmeric keyline-ring = the primary action is live (S8 accent affordance).
+          "h-11 w-full rounded-xl bg-ink text-paper ring-1 ring-reveal ring-offset-2 ring-offset-paper transition-transform hover:bg-ink/90 active:scale-[.98]"
         )}
       >
         Kongsi · Share verdict →
