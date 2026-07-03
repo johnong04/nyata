@@ -10,6 +10,7 @@
  * on-screen only and never baked into the flat share export (that's S4).
  */
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import type { Product, Verdict, Recall, Dossier, Member } from "@/lib/types";
 import { RedactionBar } from "@/components/nyata/redaction-bar";
@@ -22,6 +23,7 @@ import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { buttonVariants } from "@/components/ui/button";
+import { DUR, EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export function VerdictDetail({
@@ -42,14 +44,14 @@ export function VerdictDetail({
   // The un-redaction: bar covers hazards, wipes on mount (~450ms). The
   // RedactionBar primitive owns the reduced-motion floor (cross-fade), but we
   // still short-circuit the timer so reduced-motion reveals instantly.
+  const reduce = useReducedMotion();
   const [revealed, setRevealed] = useState(false);
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setRevealed(true);
       return;
     }
-    const t = setTimeout(() => setRevealed(true), 450);
+    const t = setTimeout(() => setRevealed(true), DUR.reveal * 1000);
     return () => clearTimeout(t);
   }, []);
 
@@ -71,7 +73,15 @@ export function VerdictDetail({
         <CardContainer className="w-full py-0" containerClassName="py-0">
           <CardBody className="h-auto w-full rounded-2xl bg-card p-6">
             <CardItem translateZ={40} className="w-full">
-              <VerdictStamp rating={verdict.rating} />
+              {/* Stamp pop-in — scale 0.96→1, timed to land as the redaction bar
+                  finishes wiping so the reveal reads as ONE moment (§7). */}
+              <motion.div
+                initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: DUR.reveal, ease: EASE.out }}
+              >
+                <VerdictStamp rating={verdict.rating} />
+              </motion.div>
             </CardItem>
           </CardBody>
         </CardContainer>

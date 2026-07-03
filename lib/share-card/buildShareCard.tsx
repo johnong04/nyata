@@ -178,7 +178,9 @@ export function buildShareCard(data: ShareCardData): ReactElement {
             {productName}
           </div>
         </div>
-        {/* turmeric glow sliver — the light leaking from under the lifting bar */}
+        {/* turmeric glow sliver — the light leaking from under the lifting bar.
+            Thicker solid edge + a gradient falloff so the mid-lift signature
+            reads unmistakably even at feed-thumbnail scale (§8). */}
         <div
           style={{
             display: "flex",
@@ -186,8 +188,19 @@ export function buildShareCard(data: ShareCardData): ReactElement {
             top: 102,
             left: 56,
             width: 700,
-            height: 10,
+            height: 14,
             backgroundColor: REVEAL,
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            top: 116,
+            left: 56,
+            width: 700,
+            height: 34,
+            backgroundImage: `linear-gradient(to bottom, ${REVEAL}, rgba(242,169,0,0))`,
           }}
         />
         {/* the ink redaction bar, frozen mid-lift over the top ~72% width */}
