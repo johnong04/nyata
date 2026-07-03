@@ -16,6 +16,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      ingredient_hazards: {
+        Row: {
+          aliases: string[]
+          authority: string
+          classification: string
+          created_at: string
+          e_number: string | null
+          id: string
+          ingredient: string
+          jurisdiction: string
+          kind: string
+          severity: string
+          source_url: string
+          verbatim_quote: string
+          verified_at: string | null
+        }
+        Insert: {
+          aliases?: string[]
+          authority: string
+          classification: string
+          created_at?: string
+          e_number?: string | null
+          id?: string
+          ingredient: string
+          jurisdiction: string
+          kind: string
+          severity: string
+          source_url: string
+          verbatim_quote: string
+          verified_at?: string | null
+        }
+        Update: {
+          aliases?: string[]
+          authority?: string
+          classification?: string
+          created_at?: string
+          e_number?: string | null
+          id?: string
+          ingredient?: string
+          jurisdiction?: string
+          kind?: string
+          severity?: string
+          source_url?: string
+          verbatim_quote?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string
