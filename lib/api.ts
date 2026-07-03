@@ -38,7 +38,7 @@ import {
   getRecallsForProductReal,
   getProductByBarcodeReal,
   getVerdictReal,
-  getVerdictFromPhoto as getVerdictFromPhotoReal,
+  getVerdictFromPhotos as getVerdictFromPhotosReal,
 } from "@/lib/api-server";
 
 // ---------------------------------------------------------------------------
@@ -153,21 +153,24 @@ export async function getVerdict(barcode: string): Promise<Verdict> {
 }
 
 /**
- * OCR "snap the label" fallback: OFF miss → read the label photo with Gemini
- * vision → AI verdict, cached under a synthetic `ocr-<hash>` barcode. Purely a
- * live path (there is no meaningful mock for an arbitrary user photo); on any
- * failure the fallback reports `ok:false` so the caller shows a friendly retry
- * rather than routing to a dead-end page. `dataUrl` is a base64 JPEG data URL,
- * already downscaled client-side to keep the server-action payload small.
+ * OCR photo→verdict path (§11.4). Pass `barcode` for the OFF-miss branch (the OCR
+ * product is cached under that REAL barcode — the identity anchor); omit it for
+ * the pure "snap the label" branch (a synthetic `ocr-<hash>` key). `backPhoto` =
+ * ingredients side, `frontPhoto` = name/brand side. Purely a live path (no
+ * meaningful mock for an arbitrary user photo); on any failure the fallback
+ * reports `ok:false` so the caller shows a friendly retry rather than a dead-end
+ * page. Photos are base64 JPEG data URLs, already downscaled client-side.
  */
-export async function getVerdictFromPhoto(
-  dataUrl: string,
-): Promise<{ barcode: string; ok: boolean }> {
+export async function getVerdictFromPhotos(input: {
+  barcode?: string;
+  backPhoto?: string;
+  frontPhoto?: string;
+}): Promise<{ barcode: string; ok: boolean }> {
   return withFallback(
-    () => getVerdictFromPhotoReal(dataUrl),
+    () => getVerdictFromPhotosReal(input),
     () => ({ barcode: "", ok: false }),
-    // OCR round-trip (vision + AI) is slower than a barcode lookup; give it room.
-    { timeoutMs: 20000 },
+    // Up to two OCR round-trips + verdict — give it room past the barcode default.
+    { timeoutMs: 25000 },
   );
 }
 

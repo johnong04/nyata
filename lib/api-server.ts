@@ -52,32 +52,35 @@ export async function getVerdictReal(barcode: string): Promise<Verdict> {
 }
 
 /**
- * OCR "snap the label" path. Takes a label photo (base64 data URL), derives a
- * STABLE synthetic barcode from the bytes (`ocr-<hash>` — same photo → same
- * barcode, so a re-snap reuses the cached verdict instead of re-billing OCR/AI),
- * and runs the full engine with `labelPhoto` set. The engine OCRs the label →
- * builds a `source:"ocr"` product → caches it under the synthetic barcode → AI
- * verdict. Because the product is cached under that barcode, the existing
- * `/product/<synthetic>` page resolves it on the follow-up navigation.
- *
- * Returns the synthetic barcode plus `ok`: `ok:false` means the engine could not
- * read the label (no OCR key / unreadable photo / AI failure → stub verdict), so
- * the client can surface a friendly "couldn't read the label" retry instead of
- * routing into a dead-end product page. Never throws.
+ * Photo → verdict. If `barcode` is supplied (barcode detected but OFF missed),
+ * the OCR product is cached under that REAL barcode — the identity anchor, so
+ * later scanners hit the cache with the barcode alone (§11.4). With no barcode
+ * (pure "snap the label"), a stable synthetic `ocr-<hash>` key is derived from
+ * the photo bytes so a re-snap reuses the cached verdict instead of re-billing.
+ * `backPhoto` = ingredients side, `frontPhoto` = name/brand side (either optional).
+ * Returns the resolved barcode + `ok` (false = unreadable → client shows a retry,
+ * not a dead-end page). Never throws.
  */
-export async function getVerdictFromPhoto(
-  dataUrl: string,
-): Promise<{ barcode: string; ok: boolean }> {
-  const barcode = syntheticBarcode(dataUrl);
+export async function getVerdictFromPhotos(input: {
+  barcode?: string;
+  backPhoto?: string;
+  frontPhoto?: string;
+}): Promise<{ barcode: string; ok: boolean }> {
+  const key =
+    input.barcode?.trim() ||
+    syntheticBarcode((input.backPhoto ?? "") + (input.frontPhoto ?? ""));
   try {
-    const verdict = await getVerdictEngine({ barcode, labelPhoto: dataUrl });
-    // A stub verdict (rating 5, zero flags) means OCR/AI didn't complete — the
-    // engine never caches stubs, so no product row exists to route to. Signal a
-    // friendly retry rather than a 404.
+    const verdict = await getVerdictEngine({
+      barcode: key,
+      labelPhoto: input.backPhoto,
+      frontPhoto: input.frontPhoto,
+    });
+    // Stub (rating 5, zero flags) ⇒ OCR/AI didn't complete ⇒ no product row to
+    // route to ⇒ signal a friendly retry rather than a 404.
     const ok = !(verdict.rating === 5 && verdict.flags.length === 0);
-    return { barcode, ok };
+    return { barcode: key, ok };
   } catch {
-    return { barcode, ok: false };
+    return { barcode: key, ok: false };
   }
 }
 
