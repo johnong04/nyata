@@ -51,20 +51,25 @@ def parse_table(html: str, cfg=None) -> list[RecallRecord]:
 
 def scrape() -> list[RecallRecord]:
     cfg = SOURCES["mysafe"]
-    seen: set[str] = set()
+    seen: set[str] = set()                          # dedup by synthesised official_url
     records: list[RecallRecord] = []
     for page in range(1, cfg.max_pages + 1):
         url = cfg.list_url if page == 1 else f"{cfg.list_url}?page={page}"
         html = fetch_static(url)
         if not html:
             break
-        page_rows = parse_table(html, cfg)
-        new = [r for r in page_rows if r.official_url not in seen]
-        for r in new:
+        page_new = 0
+        for r in parse_table(html, cfg):
+            # Dedup immediately (INTRA-page too): the portal can list the same
+            # product+notice several times, which would collapse to one slug and
+            # otherwise duplicate the conflict key in the upsert batch.
+            if r.official_url in seen:
+                continue
             seen.add(r.official_url)
-        if not new:
+            records.append(r)
+            page_new += 1
+            if len(records) >= cfg.max_items:
+                return records
+        if page_new == 0:
             break                                   # no fresh rows -> end of list
-        records.extend(new)
-        if len(records) >= cfg.max_items:
-            break
-    return records[: cfg.max_items]
+    return records

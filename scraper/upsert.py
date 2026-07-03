@@ -7,21 +7,41 @@ un-scraped source simply keeps its existing rows.
 import os
 
 from dotenv import load_dotenv
-from supabase import Client, create_client
 
 from scraper.record import RecallRecord
 
 load_dotenv(".env.local")
 
 
-def get_client() -> Client:
+def get_client():
+    # Lazy import: --dry-run must run without supabase-py installed, and the repo's
+    # local `supabase/` (migrations) dir must not be imported in its place.
+    from supabase import create_client
     url = os.environ["NEXT_PUBLIC_SUPABASE_URL"]
     key = os.environ["SUPABASE_SECRET_KEY"]     # service key; server-only secret
     return create_client(url, key)
 
 
+def dedup_db_rows(records: list[RecallRecord]) -> list[dict]:
+    """Collapse rows sharing the conflict key (source, official_url), keeping the
+    first. A single upsert batch must not repeat a conflict key or Postgres errors
+    'ON CONFLICT DO UPDATE command cannot affect row a second time'. Duplicates
+    here are genuine (identical product+notice listed twice), so first-wins is
+    lossless. Pure — unit-tested offline."""
+    seen: set[tuple] = set()
+    rows: list[dict] = []
+    for r in records:
+        row = r.to_db_row()
+        key = (row["source"], row["official_url"])
+        if key in seen:
+            continue
+        seen.add(key)
+        rows.append(row)
+    return rows
+
+
 def upsert_records(records: list[RecallRecord]) -> int:
-    rows = [r.to_db_row() for r in records]
+    rows = dedup_db_rows(records)
     if not rows:
         return 0
     client = get_client()

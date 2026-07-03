@@ -19,8 +19,21 @@ import json
 import os
 import sys
 
-# Make `python scraper/recalls.py` work: put repo root (parent of scraper/) on path.
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Make `python scraper/recalls.py` work: add repo root (parent of scraper/) so the
+# `scraper` package resolves. APPEND (not insert-0) so site-packages still wins for
+# `import supabase` — the repo has a local `supabase/` (migrations) dir that would
+# otherwise shadow the installed supabase library.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _REPO_ROOT not in sys.path:
+    sys.path.append(_REPO_ROOT)
+
+# Print the dry-run JSON as UTF-8 so verbatim titles (®, BM diacritics) survive
+# redirection on Windows (default console encoding is cp1252).
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")
+    except (AttributeError, ValueError):
+        pass
 
 from scraper.config import SOURCES                       # noqa: E402
 from scraper.sources import moh, mysafe, npra            # noqa: E402
