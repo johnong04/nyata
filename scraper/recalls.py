@@ -7,7 +7,7 @@ Guarantees:
     its seed rows kept (AC10). One dead source never kills the run.
   - Every official_url is verified LIVE and .gov.my before upsert (LC1, specs §6);
     dead / non-gov links are dropped (logged), never inserted.
-  - Upsert-only on UNIQUE(source, official_url) — never deletes (AC9); re-runs are
+  - Upsert-only on UNIQUE(source, title, date) — never deletes (AC9); re-runs are
     idempotent (AC8).
   - Exits 0 even if some / all sources fail.
 

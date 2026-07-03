@@ -12,8 +12,6 @@ from datetime import datetime
 import requests
 from selectolax.parser import HTMLParser
 
-from scraper.normalize import normalize
-
 _UA = {"User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                       "AppleWebKit/537.36 (KHTML, like Gecko) "
                       "Chrome/126.0 Safari/537.36")}
@@ -51,13 +49,6 @@ def to_iso(raw: str | None) -> str | None:
         except ValueError:
             continue
     return None
-
-
-def slug(s: str) -> str:
-    """Stable, deterministic per-notice slug from normalized text (hyphenated).
-    Used to synthesise a per-row unique key for sources whose rows share one
-    listing URL (see KPDN collision resolution in mysafe.py)."""
-    return re.sub(r"[^a-z0-9]+", "-", normalize(s)).strip("-")
 
 
 def parse(html: str) -> HTMLParser:

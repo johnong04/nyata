@@ -3,20 +3,18 @@ Portal `/portal/post/3` renders the individual product-recall list server-side a
 <table class="table table-bordered table-striped">. Columns (1-indexed td):
 2=Product Name, 5=Notice of Recall (action words), 6=Date of Recall (DD-MM-YYYY).
 
-KPDN-URL-COLLISION RESOLUTION (S3 review note #1): the "Relevant Website" column
-links to the brand's OWN external, non-.gov.my site — legally unusable as the
-source link — so every row's defensible official_url is the SAME .gov.my portal
-listing. Under UNIQUE(source, official_url) that collapses all KPDN rows into one.
-Resolution: append a stable per-notice fragment `#recall-<slug(product)>` to the
-listing URL. The fragment is deterministic (idempotent re-runs), unique per
-product, and does NOT change what the URL resolves to — verify still fetches the
-live .gov.my portal page (LC1 holds). It also cannot collide with the 3 KPDN
-seed URLs (which use `?page=N`, no fragment), so seeds are never overwritten.
+official_url is the PLAIN, REAL .gov.my portal listing — no invented fragment.
+The "Relevant Website" column links to the brand's OWN external, non-.gov.my site
+(legally unusable as the source link), so every KPDN row's defensible official_url
+is the SAME portal page; that's honest — users land on the real listing that
+actually holds every notice. Row identity is therefore NOT the URL: the DB de-
+duplicates recalls by (source, title, date) (see the S6 by-content migration and
+upsert.py), so distinct notices sharing one portal URL each get their own row.
 """
 from scraper.config import SOURCES
 from scraper.record import RecallRecord
 from scraper.severity import severity
-from scraper.sources.base import fetch_static, parse, slug, to_iso
+from scraper.sources.base import fetch_static, parse, to_iso
 
 
 def parse_table(html: str, cfg=None) -> list[RecallRecord]:
@@ -35,11 +33,10 @@ def parse_table(html: str, cfg=None) -> list[RecallRecord]:
         date_iso = to_iso(tds[5].text(strip=True))
         if not product or not date_iso:
             continue  # fail closed: no product or no real date -> drop (no placeholder)
-        official_url = f"{cfg.list_url}#recall-{slug(product)}"
         out.append(RecallRecord(
             source=cfg.label,                       # 'KPDN'
             title=product,                          # VERBATIM (product name is the notice heading)
-            official_url=official_url,
+            official_url=cfg.list_url,              # PLAIN real portal URL (no fragment)
             date=date_iso,
             brand=product.split(" ")[0] if product else None,   # structured: leading token
             product=product,
@@ -51,7 +48,7 @@ def parse_table(html: str, cfg=None) -> list[RecallRecord]:
 
 def scrape() -> list[RecallRecord]:
     cfg = SOURCES["mysafe"]
-    seen: set[str] = set()                          # dedup by synthesised official_url
+    seen: set[tuple] = set()                        # dedup by (title, date) content key
     records: list[RecallRecord] = []
     for page in range(1, cfg.max_pages + 1):
         url = cfg.list_url if page == 1 else f"{cfg.list_url}?page={page}"
@@ -60,12 +57,14 @@ def scrape() -> list[RecallRecord]:
             break
         page_new = 0
         for r in parse_table(html, cfg):
-            # Dedup immediately (INTRA-page too): the portal can list the same
-            # product+notice several times, which would collapse to one slug and
-            # otherwise duplicate the conflict key in the upsert batch.
-            if r.official_url in seen:
+            # Dedup immediately (INTRA- and cross-page): all KPDN rows share one
+            # portal official_url, so identity is the content key (title, date) —
+            # the same (source, title, date) the upsert conflicts on. This stops a
+            # notice repeated on the portal from duplicating the conflict key.
+            key = (r.title, r.date)
+            if key in seen:
                 continue
-            seen.add(r.official_url)
+            seen.add(key)
             records.append(r)
             page_new += 1
             if len(records) >= cfg.max_items:

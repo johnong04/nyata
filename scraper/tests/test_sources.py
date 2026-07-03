@@ -33,14 +33,17 @@ def test_mysafe_fixture_yields_kpdn_rows():
     assert row["match_barcode"] is None
 
 
-def test_kpdn_official_urls_are_unique_per_row():
-    """KPDN-URL-collision resolution: rows share one listing page, yet each row
-    gets a distinct, stable official_url via a #recall-<slug> fragment."""
+def test_kpdn_official_url_is_plain_portal_no_fragment():
+    """Every KPDN row stores the PLAIN real portal listing URL — no invented
+    #recall-<slug> fragment. Rows are distinguished by content (title, date),
+    not URL (see the S6 by-content dedup)."""
     records = mysafe.parse_table(_html("mysafe.html"))
     urls = [r.official_url for r in records]
-    assert len(urls) == len(set(urls))                       # no collisions
-    assert all(u.startswith("https://mysafe.kpdn.gov.my/portal/post/3#recall-")
-               for u in urls)
+    assert all(u == "https://mysafe.kpdn.gov.my/portal/post/3" for u in urls)
+    assert all("#" not in u for u in urls)                   # no fake fragment
+    # Content keys stay distinct so the (source, title, date) upsert never collides.
+    keys = [(r.source, r.title, r.date) for r in records]
+    assert len(keys) == len(set(keys))
 
 
 def test_kpdn_dateless_row_is_dropped_no_placeholder():
