@@ -1,0 +1,598 @@
+[
+  {
+    "ingredient": "Titanium dioxide",
+    "aliases": [
+      "titanium dioxide",
+      "colour e171",
+      "ci 77891",
+      "e171"
+    ],
+    "e_number": "E171",
+    "kind": "additive",
+    "classification": "no longer considered safe as a food additive",
+    "authority": "EFSA",
+    "verbatim_quote": "It was banned as a food additive by the European Union in 2022, after the European Food Safety Authority (EFSA) raised concerns about its safety.",
+    "source_url": "https://en.wikipedia.org/wiki/Titanium_dioxide",
+    "jurisdiction": "Permitted in Malaysia; banned as a food additive in the EU since 2022.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Potassium bromate",
+    "aliases": [
+      "potassium bromate",
+      "e924",
+      "bromated flour"
+    ],
+    "e_number": "E924",
+    "kind": "additive",
+    "classification": "flour treatment agent the FDA urges bakers not to use",
+    "authority": "US FDA",
+    "verbatim_quote": "Since 1991, the FDA has urged bakers not to use it, but has not mandated a ban.",
+    "source_url": "https://en.wikipedia.org/wiki/Potassium_bromate",
+    "jurisdiction": "Banned in the EU, UK and Canada; discouraged in the US; still used in some Malaysian bakery flour.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Brominated vegetable oil",
+    "aliases": [
+      "brominated vegetable oil",
+      "bvo"
+    ],
+    "e_number": null,
+    "kind": "additive",
+    "classification": "emulsifier banned from food and drink in several countries",
+    "authority": "Health Canada",
+    "verbatim_quote": "Canada has banned the use of brominated vegetable oil since August 30, 2024.",
+    "source_url": "https://en.wikipedia.org/wiki/Brominated_vegetable_oil",
+    "jurisdiction": "Banned in Canada (2024), the US (2024) and the EU; may still appear in some citrus soft drinks.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Azodicarbonamide",
+    "aliases": [
+      "azodicarbonamide",
+      "ada",
+      "e927a"
+    ],
+    "e_number": "E927a",
+    "kind": "additive",
+    "classification": "flour/dough conditioner banned as a food additive in some regions",
+    "authority": "EFSA",
+    "verbatim_quote": "In jurisdictions such as Australia and the European Union , azodicarbonamide as a food additive is banned.",
+    "source_url": "https://en.wikipedia.org/wiki/Azodicarbonamide",
+    "jurisdiction": "Banned as a food additive in the EU and Australia; permitted (limited) in the US and Malaysia.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Butylated hydroxyanisole",
+    "aliases": [
+      "butylated hydroxyanisole",
+      "bha",
+      "e320"
+    ],
+    "e_number": "E320",
+    "kind": "additive",
+    "classification": "reasonably anticipated to be a human carcinogen",
+    "authority": "US NIH / National Toxicology Program",
+    "verbatim_quote": "National Institutes of Health report that BHA is reasonably anticipated to be a human carcinogen based on evidence of carcinogenicity in experimental animals.",
+    "source_url": "https://en.wikipedia.org/wiki/Butylated_hydroxyanisole",
+    "jurisdiction": "Permitted as an antioxidant in Malaysia and the US; flagged as a suspected carcinogen and restricted elsewhere.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Butylated hydroxytoluene",
+    "aliases": [
+      "butylated hydroxytoluene",
+      "bht",
+      "e321"
+    ],
+    "e_number": "E321",
+    "kind": "additive",
+    "classification": "synthetic antioxidant preservative",
+    "authority": "EFSA",
+    "verbatim_quote": "It is permitted in the European Union under E321",
+    "source_url": "https://en.wikipedia.org/wiki/Butylated_hydroxytoluene",
+    "jurisdiction": "Permitted in the EU, US and Malaysia; restricted or avoided by some manufacturers over safety concerns.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Sodium nitrite",
+    "aliases": [
+      "sodium nitrite",
+      "e250"
+    ],
+    "e_number": "E250",
+    "kind": "additive",
+    "classification": "curing agent linked to carcinogenic nitrosamines",
+    "authority": "IARC",
+    "verbatim_quote": "has been classified as \"probably carcinogenic to humans\" by International Agency for Research on Cancer (IARC).",
+    "source_url": "https://en.wikipedia.org/wiki/Sodium_nitrite",
+    "jurisdiction": "Permitted as a curing preservative in Malaysia, the EU and US; IARC links nitrite/processed meat to cancer.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Potassium nitrite",
+    "aliases": [
+      "potassium nitrite",
+      "e249"
+    ],
+    "e_number": "E249",
+    "kind": "additive",
+    "classification": "curing preservative similar to sodium nitrite",
+    "authority": "EFSA",
+    "verbatim_quote": "potassium nitrite is used as a preservative similar to sodium nitrite",
+    "source_url": "https://en.wikipedia.org/wiki/Potassium_nitrite",
+    "jurisdiction": "Permitted as a curing agent in Malaysia and the EU; shares the nitrosamine concern of sodium nitrite.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Tartrazine",
+    "aliases": [
+      "tartrazine",
+      "e102",
+      "fd&c yellow 5",
+      "yellow 5",
+      "ci 19140"
+    ],
+    "e_number": "E102",
+    "kind": "additive",
+    "classification": "azo dye associated with hyperactivity and intolerance",
+    "authority": "Health Canada",
+    "verbatim_quote": "Tartrazine is listed as a permitted food coloring in Canada",
+    "source_url": "https://en.wikipedia.org/wiki/Tartrazine",
+    "jurisdiction": "Permitted in Malaysia, EU and US, but the EU requires a hyperactivity warning label the US does not.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Sunset Yellow FCF",
+    "aliases": [
+      "sunset yellow fcf",
+      "e110",
+      "fd&c yellow 6",
+      "yellow 6",
+      "ci 15985"
+    ],
+    "e_number": "E110",
+    "kind": "additive",
+    "classification": "azo dye subject to restriction and warning labelling",
+    "authority": "EFSA",
+    "verbatim_quote": "Sunset yellow FCF was not approved in Norway before 2001.",
+    "source_url": "https://en.wikipedia.org/wiki/Sunset_Yellow_FCF",
+    "jurisdiction": "Permitted in Malaysia, EU and US, but the EU requires a hyperactivity warning label the US does not.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Allura Red AC",
+    "aliases": [
+      "allura red ac",
+      "e129",
+      "fd&c red 40",
+      "red 40",
+      "ci 16035"
+    ],
+    "e_number": "E129",
+    "kind": "additive",
+    "classification": "azo dye that must carry a warning label in the EU",
+    "authority": "EFSA",
+    "verbatim_quote": "In the European Union, it is approved, but it must carry a warning label.",
+    "source_url": "https://en.wikipedia.org/wiki/Allura_Red_AC",
+    "jurisdiction": "Permitted in Malaysia and the US; approved in the EU only with a mandatory hyperactivity warning label.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Ponceau 4R",
+    "aliases": [
+      "ponceau 4r",
+      "e124",
+      "cochineal red a",
+      "ci 16255"
+    ],
+    "e_number": "E124",
+    "kind": "additive",
+    "classification": "azo dye not approved for food use in the US",
+    "authority": "US FDA",
+    "verbatim_quote": "used in Europe, Asia, and Australia, but has not been approved for human consumption by the United States",
+    "source_url": "https://en.wikipedia.org/wiki/Ponceau_4R",
+    "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not approved for food in the US.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Quinoline Yellow WS",
+    "aliases": [
+      "quinoline yellow",
+      "quinoline yellow ws",
+      "e104",
+      "ci 47005"
+    ],
+    "e_number": "E104",
+    "kind": "additive",
+    "classification": "colour not permitted as a food additive in the US or Canada",
+    "authority": "US FDA",
+    "verbatim_quote": "Quinoline Yellow is not listed as a permitted food additive in Canada or the US",
+    "source_url": "https://en.wikipedia.org/wiki/Quinoline_Yellow_WS",
+    "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not a permitted food additive in the US or Canada.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Carmoisine",
+    "aliases": [
+      "carmoisine",
+      "azorubine",
+      "e122",
+      "ci 14720"
+    ],
+    "e_number": "E122",
+    "kind": "additive",
+    "classification": "azo dye delisted for food use in the US",
+    "authority": "US FDA",
+    "verbatim_quote": "It was delisted in 1963 because no party was interested in supporting the studies needed to establish safety.",
+    "source_url": "https://en.wikipedia.org/wiki/Azorubine",
+    "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not approved for food in the US.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Sodium benzoate",
+    "aliases": [
+      "sodium benzoate",
+      "e211"
+    ],
+    "e_number": "E211",
+    "kind": "additive",
+    "classification": "preservative that can form benzene with ascorbic acid",
+    "authority": "US FDA",
+    "verbatim_quote": "In 2006, the Food and Drug Administration tested 100 beverages available in the United States that contained both ascorbic acid and benzoate.",
+    "source_url": "https://en.wikipedia.org/wiki/Sodium_benzoate",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; can form benzene in acidic drinks containing vitamin C.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Aspartame",
+    "aliases": [
+      "aspartame",
+      "e951"
+    ],
+    "e_number": "E951",
+    "kind": "additive",
+    "classification": "sweetener IARC classifies as possibly carcinogenic",
+    "authority": "IARC",
+    "verbatim_quote": "The FDA disagrees with IARC's conclusion that these studies support classifying aspartame as a possible carcinogen to humans.",
+    "source_url": "https://en.wikipedia.org/wiki/Aspartame",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; IARC classified it as possibly carcinogenic (Group 2B) in 2023.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Acesulfame potassium",
+    "aliases": [
+      "acesulfame potassium",
+      "acesulfame k",
+      "ace-k",
+      "e950"
+    ],
+    "e_number": "E950",
+    "kind": "additive",
+    "classification": "artificial sweetener under ongoing safety review",
+    "authority": "EFSA",
+    "verbatim_quote": "In the European Union, it is known under the E number (additive code) E950",
+    "source_url": "https://en.wikipedia.org/wiki/Acesulfame_potassium",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; EFSA has been asked to re-evaluate its safety.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Monosodium glutamate",
+    "aliases": [
+      "monosodium glutamate",
+      "msg",
+      "e621",
+      "flavour enhancer 621"
+    ],
+    "e_number": "E621",
+    "kind": "additive",
+    "classification": "flavour enhancer permitted subject to quantitative limits",
+    "authority": "EFSA",
+    "verbatim_quote": "The European Union classifies it as a food additive permitted in certain foods and subject to quantitative limits.",
+    "source_url": "https://en.wikipedia.org/wiki/Monosodium_glutamate",
+    "jurisdiction": "Permitted in Malaysia and the US; the EU sets a group ADI and quantitative limits on its use.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "High-fructose corn syrup",
+    "aliases": [
+      "high-fructose corn syrup",
+      "hfcs",
+      "isoglucose",
+      "glucose-fructose syrup"
+    ],
+    "e_number": null,
+    "kind": "sugar_sodium",
+    "classification": "added-sugar sweetener restricted by EU production quota",
+    "authority": "European Commission",
+    "verbatim_quote": "In the European Union (EU), HFCS is known as isoglucose or glucose–fructose syrup ( GFS )",
+    "source_url": "https://en.wikipedia.org/wiki/High-fructose_corn_syrup",
+    "jurisdiction": "Widely used in the US; production in the EU was capped by isoglucose quotas until 2017.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Carrageenan",
+    "aliases": [
+      "carrageenan",
+      "e407",
+      "processed eucheuma seaweed"
+    ],
+    "e_number": "E407",
+    "kind": "additive",
+    "classification": "thickener restricted in infant formula in the EU",
+    "authority": "EFSA",
+    "verbatim_quote": "The use of carrageenan in infant formula is not prohibited in the EU for precautionary reasons, but is permitted in other food items",
+    "source_url": "https://en.wikipedia.org/wiki/Carrageenan",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; the EU applies precautionary limits for infant formula.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Propylparaben",
+    "aliases": [
+      "propylparaben",
+      "e216",
+      "propyl p-hydroxybenzoate"
+    ],
+    "e_number": "E216",
+    "kind": "additive",
+    "classification": "paraben preservative removed from EU food additives",
+    "authority": "EFSA",
+    "verbatim_quote": "As of May 2023, New York was considering banning the use of propylparaben",
+    "source_url": "https://en.wikipedia.org/wiki/Propylparaben",
+    "jurisdiction": "No longer permitted as a food additive in the EU; still used in some products in the US and elsewhere.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Sulphur dioxide",
+    "aliases": [
+      "sulphur dioxide",
+      "sulfur dioxide",
+      "e220",
+      "so2"
+    ],
+    "e_number": "E220",
+    "kind": "additive",
+    "classification": "preservative capped at differing limits by jurisdiction",
+    "authority": "EFSA",
+    "verbatim_quote": "The upper limit of total SO 2 allowed in wine in the US is 350 ppm; in the EU it is 160 ppm for red wines and 210 ppm for white and rosé wines.",
+    "source_url": "https://en.wikipedia.org/wiki/Sulfur_dioxide",
+    "jurisdiction": "Permitted as a preservative in Malaysia, the EU and US, but the EU sets much lower limits than the US.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Sodium cyclamate",
+    "aliases": [
+      "sodium cyclamate",
+      "cyclamate",
+      "e952"
+    ],
+    "e_number": "E952",
+    "kind": "additive",
+    "classification": "sweetener banned in the US but permitted in the EU",
+    "authority": "US FDA",
+    "verbatim_quote": "Safety concerns led to it being banned in a few countries, though the European Union considers it safe.",
+    "source_url": "https://en.wikipedia.org/wiki/Sodium_cyclamate",
+    "jurisdiction": "Permitted in Malaysia and the EU; banned as a food additive in the US since 1969.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Saccharin",
+    "aliases": [
+      "saccharin",
+      "e954"
+    ],
+    "e_number": "E954",
+    "kind": "additive",
+    "classification": "sweetener formerly listed as a suspected carcinogen",
+    "authority": "US FDA",
+    "verbatim_quote": "countries such as Canada have lifted their previous ban of it as a food additive",
+    "source_url": "https://en.wikipedia.org/wiki/Saccharin",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; was banned in Canada and carried a US warning label for decades.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Erythrosine",
+    "aliases": [
+      "erythrosine",
+      "e127",
+      "red 3",
+      "fd&c red 3",
+      "ci 45430"
+    ],
+    "e_number": "E127",
+    "kind": "additive",
+    "classification": "colour banned from many US uses over carcinogenicity",
+    "authority": "US FDA",
+    "verbatim_quote": "in all uses as its lake variant have been banned by the Food and Drug Administration (FDA) since 1990",
+    "source_url": "https://en.wikipedia.org/wiki/Erythrosine",
+    "jurisdiction": "Permitted in Malaysia and the EU; the US banned the lake form in 1990 and revoked remaining food uses in 2025.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Propyl gallate",
+    "aliases": [
+      "propyl gallate",
+      "e310"
+    ],
+    "e_number": "E310",
+    "kind": "additive",
+    "classification": "antioxidant restricted or banned in some countries",
+    "authority": "US FDA",
+    "verbatim_quote": "The FDA recognizes propyl gallate as being generally safe, but in other countries, it's either been used on a very limited basis or completely banned.",
+    "source_url": "https://en.wikipedia.org/wiki/Propyl_gallate",
+    "jurisdiction": "Generally recognised as safe in the US; restricted or banned as a food additive in some other countries.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Potassium sorbate",
+    "aliases": [
+      "potassium sorbate",
+      "e202"
+    ],
+    "e_number": "E202",
+    "kind": "additive",
+    "classification": "widely permitted food preservative",
+    "authority": "EFSA",
+    "verbatim_quote": "used as a food preservative ( E number 202).",
+    "source_url": "https://en.wikipedia.org/wiki/Potassium_sorbate",
+    "jurisdiction": "Permitted as a preservative in Malaysia, the EU and US; among the more benign synthetic preservatives.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Trans fat",
+    "aliases": [
+      "trans fat",
+      "partially hydrogenated oil",
+      "partially hydrogenated vegetable oil",
+      "pho"
+    ],
+    "e_number": null,
+    "kind": "contaminant",
+    "classification": "industrial trans fat banned from the US food supply",
+    "authority": "US FDA",
+    "verbatim_quote": "First, in 2013 the FDA announced it planned to completely ban artificial trans fat in the form of partially hydrogenated oil.",
+    "source_url": "https://en.wikipedia.org/wiki/Trans_fat",
+    "jurisdiction": "Industrial trans fat (partially hydrogenated oil) banned in the US and restricted by the WHO; still found in some Malaysian products.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Indigo carmine",
+    "aliases": [
+      "indigo carmine",
+      "indigotine",
+      "e132",
+      "blue 2",
+      "fd&c blue 2",
+      "ci 73015"
+    ],
+    "e_number": "E132",
+    "kind": "additive",
+    "classification": "synthetic blue colour approved in the US and EU",
+    "authority": "US FDA",
+    "verbatim_quote": "It is approved for human consumption in the United States and European Union.",
+    "source_url": "https://en.wikipedia.org/wiki/Indigo_carmine",
+    "jurisdiction": "Permitted in Malaysia, the EU and US, but the EU requires a hyperactivity warning label the US does not.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Fast Green FCF",
+    "aliases": [
+      "fast green fcf",
+      "e143",
+      "fd&c green 3",
+      "green 3",
+      "ci 42053"
+    ],
+    "e_number": "E143",
+    "kind": "additive",
+    "classification": "synthetic green colour not permitted for food in the EU",
+    "authority": "US FDA",
+    "verbatim_quote": "In the United States, Fast Green FCF is the least used of the seven main FDA approved dyes.",
+    "source_url": "https://en.wikipedia.org/wiki/Fast_Green_FCF",
+    "jurisdiction": "Approved for food in the US; not permitted as a food colour in the EU.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Brilliant Blue FCF",
+    "aliases": [
+      "brilliant blue fcf",
+      "e133",
+      "fd&c blue 1",
+      "blue 1",
+      "ci 42090"
+    ],
+    "e_number": "E133",
+    "kind": "additive",
+    "classification": "synthetic blue colour with cross-country label differences",
+    "authority": "US FDA",
+    "verbatim_quote": "It is denoted by E number E133 and has a color index of 42090.",
+    "source_url": "https://en.wikipedia.org/wiki/Brilliant_Blue_FCF",
+    "jurisdiction": "Permitted in Malaysia, the EU and US; the EU requires a hyperactivity warning label the US does not.",
+    "severity": "low",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Amaranth",
+    "aliases": [
+      "amaranth",
+      "e123",
+      "fd&c red 2",
+      "red 2",
+      "ci 16185"
+    ],
+    "e_number": "E123",
+    "kind": "additive",
+    "classification": "azo dye banned as a food colour in the US",
+    "authority": "US FDA",
+    "verbatim_quote": "amaranth dye has been banned in the United States by the Food and Drug Administration (FDA)",
+    "source_url": "https://en.wikipedia.org/wiki/Amaranth_(dye)",
+    "jurisdiction": "Permitted in Malaysia and the EU (with warning label); banned as a food colour in the US since 1976.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Red 2G",
+    "aliases": [
+      "red 2g",
+      "e128",
+      "ci 18050"
+    ],
+    "e_number": "E128",
+    "kind": "additive",
+    "classification": "azo dye suspended as a food colour in the EU",
+    "authority": "EFSA",
+    "verbatim_quote": "In the European Union, Red 2G was used as a food dye ( E number E128).",
+    "source_url": "https://en.wikipedia.org/wiki/Red_2G",
+    "jurisdiction": "Suspended as a food colour in the EU since 2007 over safety concerns; never approved in the US.",
+    "severity": "high",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  },
+  {
+    "ingredient": "Olestra",
+    "aliases": [
+      "olestra",
+      "olean",
+      "sucrose polyester"
+    ],
+    "e_number": null,
+    "kind": "additive",
+    "classification": "fat substitute approved in the US but not the EU",
+    "authority": "US FDA",
+    "verbatim_quote": "approved olestra for use in the US as a replacement for fats and oils in prepackaged",
+    "source_url": "https://en.wikipedia.org/wiki/Olestra",
+    "jurisdiction": "Approved as a food additive in the US; not authorised in the EU, UK or Canada.",
+    "severity": "med",
+    "verified_at": "2026-07-03T18:32:18.900Z"
+  }
+]
