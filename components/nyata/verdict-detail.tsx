@@ -11,11 +11,12 @@
  */
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { Product, Verdict, Recall } from "@/lib/types";
+import type { Product, Verdict, Recall, Dossier } from "@/lib/types";
 import { RedactionBar } from "@/components/nyata/redaction-bar";
 import { VerdictStamp } from "@/components/nyata/verdict-stamp";
 import { HazardPanel } from "@/components/nyata/hazard-panel";
 import { RecallBlock } from "@/components/nyata/recall-block";
+import { OnTheRecord } from "@/components/nyata/on-the-record";
 import { PremiumUpsell } from "@/components/nyata/premium-upsell";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
@@ -27,10 +28,12 @@ export function VerdictDetail({
   product,
   verdict,
   recalls,
+  dossier,
 }: {
   product: Product;
   verdict: Verdict;
   recalls: Recall[];
+  dossier: Dossier | null;
 }) {
   // The un-redaction: bar covers hazards, wipes on mount (~450ms). The
   // RedactionBar primitive owns the reduced-motion floor (cross-fade), but we
@@ -84,6 +87,9 @@ export function VerdictDetail({
 
       {/* Official recall — renders nothing when there are none. */}
       <RecallBlock recalls={recalls} />
+
+      {/* On the record — attributed third-party reports (never affects the verdict). */}
+      <OnTheRecord product={product} initialDossier={dossier} />
 
       {/* Premium upsell — risks stay redacted. */}
       <PremiumUpsell />
