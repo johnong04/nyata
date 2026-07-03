@@ -2,9 +2,9 @@ import "server-only";
 import type { Dossier } from "@/lib/types";
 import { normalize } from "@/lib/recalls/normalize";
 import { getCachedDossier, upsertDossier } from "./cache";
-import { fetchDossier } from "./gemini";
+import { fetchDossier } from "./openrouter";
 
-const MODEL_ID = "gemini-2.5-flash";
+const MODEL_ID = "openrouter:google/gemini-2.5-flash+web";
 
 function brandKey(input: { brand: string; name: string }): string {
   return normalize(input.brand) || normalize(input.name);
@@ -21,8 +21,8 @@ export async function getDossierCached(input: {
 }
 
 /**
- * On-demand "dig deeper": cache hit → return; else one grounded Gemini call →
- * cache → return. Null (honest empty) when nothing survives the gate / no key.
+ * On-demand "dig deeper": cache hit → return; else one OpenRouter web-plugin
+ * call → cache → return. Null (honest empty) when nothing survives the gate / no key.
  * Never throws. Caches only NON-empty dossiers (never a null).
  */
 export async function getDossier(input: {

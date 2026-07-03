@@ -11,6 +11,7 @@
   "dependencies": {
     "@ai-sdk/google": "^2.0.77",
     "@base-ui/react": "^1.6.0",
+    "@openrouter/ai-sdk-provider": "^2.10.0",
     "@radix-ui/react-tabs": "^1.1.16",
     "@react-three/fiber": "^9.6.1",
     "@supabase/ssr": "^0.12.0",
