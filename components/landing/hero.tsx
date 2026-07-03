@@ -15,7 +15,7 @@ import { RedactionBar } from "@/components/nyata/redaction-bar";
 export default function Hero() {
   return (
     <HeroHighlight
-      containerClassName="h-auto min-h-0 -mx-5 -mt-8 bg-paper py-14"
+      containerClassName="h-auto min-h-0 -mt-8 bg-paper py-14"
       className="w-full"
     >
       <section className="mx-auto flex max-w-md flex-col items-center gap-6 px-6 text-center">

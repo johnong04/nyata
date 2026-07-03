@@ -20,18 +20,22 @@ export interface LandingRecall extends Recall {
 export async function getLandingRecalls(): Promise<LandingRecall[]> {
   const recalled = await getFeed("recalled");
 
-  const collected: LandingRecall[] = [];
-  for (const item of recalled) {
-    const product = await getProductByBarcode(item.barcode);
-    if (!product) continue;
-    const recalls = await getRecallsForProduct(product);
-    for (const r of recalls) {
-      if (!r.official_url) continue; // legal §6: never surface an unlinkable recall
-      collected.push({ ...r, product: item.name, brand: item.brand });
-    }
-  }
+  // Fan out across recalled items concurrently — the previous sequential loop
+  // did N × (product lookup + recall query) live round-trips in series, which
+  // is the ~3s feed→home stall. Promise.all bounds it to ~one round-trip deep.
+  const perItem = await Promise.all(
+    recalled.map(async (item): Promise<LandingRecall[]> => {
+      const product = await getProductByBarcode(item.barcode);
+      if (!product) return [];
+      const recalls = await getRecallsForProduct(product);
+      return recalls
+        .filter((r) => Boolean(r.official_url)) // legal §6: never surface an unlinkable recall
+        .map((r) => ({ ...r, product: item.name, brand: item.brand }));
+    }),
+  );
 
-  return collected
+  return perItem
+    .flat()
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 }

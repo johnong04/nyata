@@ -1,24 +1,19 @@
 "use client";
 
 /**
- * AuthForm — real Supabase email-OTP sign-in ("The Redacted Label", §1/§9).
+ * AuthForm — Google-first sign-in ("The Redacted Label", §1/§9).
  *
- * S9 wired the S7 stub to real auth:
- *  - Email → 6-digit code (signInWithOtp), then code → session (verifyOtp).
- *    Codes (not magic links) survive the in-app browsers TikTok/IG open links in.
- *  - Google: the provider is NOT enabled in Supabase yet, so the button degrades
- *    to a disabled "Akan datang · Coming soon" state — it never hard-errors.
- *
- * Ink chrome only; the primary CTA is ink, never turmeric (turmeric = reveal
- * glow / stamp only, design §5).
+ * Run-2 S1: the email-OTP block was removed — Google OAuth (provider enabled,
+ * commit f6ea3b2) is the primary and only sign-in path. Guest mode (no auth env)
+ * disables the button and shows a guest notice, so the filmed demo never
+ * hard-errors. Ink chrome only; turmeric is reserved for reveal/stamp (design §5).
  */
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { signInWithGoogle, signInWithOtp, verifyOtp } from "@/app/(auth)/actions";
+import { signInWithGoogle } from "@/app/(auth)/actions";
 import { isAuthConfigured } from "@/lib/auth-config";
 
 const COPY = {
@@ -40,11 +35,7 @@ const COPY = {
   },
 } as const;
 
-// Errors from the server actions → direct bilingual copy (design §9).
 const ERROR_COPY: Record<string, string> = {
-  "invalid-email": "E-mel tidak sah · Invalid email",
-  "invalid-code": "Kod salah atau tamat tempoh · Wrong or expired code",
-  "otp-send-failed": "Gagal hantar kod. Cuba lagi · Couldn’t send code, try again",
   "auth-unconfigured": "Mod tetamu — log masuk dimatikan · Guest mode — sign-in off",
   "oauth-unavailable": "Google tidak tersedia · Google unavailable",
   oauth: "Log masuk Google gagal · Google sign-in failed",
@@ -74,39 +65,14 @@ function GoogleG() {
 }
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const copy = COPY[mode];
   const configured = isAuthConfigured();
-  const next = searchParams.get("next") || "/";
 
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [stage, setStage] = useState<"email" | "code">("email");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(
     searchParams.get("error") ? "oauth" : null,
   );
-
-  const sendCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setPending(true);
-    const res = await signInWithOtp(email);
-    setPending(false);
-    if (res.ok) setStage("code");
-    else setError(res.error);
-  };
-
-  const submitCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setPending(true);
-    const res = await verifyOtp(email, code);
-    setPending(false);
-    if (res.ok) router.push(next);
-    else setError(res.error);
-  };
 
   const handleGoogle = async () => {
     setError(null);
@@ -121,10 +87,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   };
 
   return (
-    <form
-      onSubmit={stage === "email" ? sendCode : submitCode}
-      className="mx-auto flex w-full max-w-sm flex-col gap-7"
-    >
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-7">
       <div className="flex flex-col gap-2">
         <p className="type-eyebrow">{copy.eyebrow}</p>
         {/* Classified-dossier signature: a thin redacted rule under the eyebrow. */}
@@ -135,98 +98,24 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <p className="font-mono text-sm text-ink-40">{copy.en}</p>
       </div>
 
-      {stage === "email" ? (
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="type-eyebrow text-[0.6875rem]">
-            E-MEL · EMAIL
-          </label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="nama@contoh.com"
-            className="h-11 rounded-xl border-line bg-card px-3.5 text-base"
-          />
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <label htmlFor="code" className="type-eyebrow text-[0.6875rem]">
-            KOD 6-DIGIT · 6-DIGIT CODE
-          </label>
-          <Input
-            id="code"
-            name="code"
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            pattern="\d{6}"
-            maxLength={6}
-            required
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-            placeholder="000000"
-            className="h-11 rounded-xl border-line bg-card px-3.5 text-center font-mono text-lg tracking-[0.4em]"
-          />
-          <p className="font-mono text-xs text-ink-40">
-            Kod dihantar ke {email} · Code sent to {email}
-          </p>
-        </div>
-      )}
-
       {error && (
         <p role="alert" className="font-mono text-sm text-[#b3261e]">
           {ERROR_COPY[error] ?? "Ralat · Something went wrong"}
         </p>
       )}
 
-      <Button
-        type="submit"
-        disabled={pending}
-        className="h-11 rounded-xl bg-ink text-paper hover:bg-ink/90 disabled:opacity-60"
-      >
-        {stage === "email"
-          ? pending
-            ? "Menghantar… · Sending…"
-            : "Hantar kod · Send code"
-          : pending
-            ? "Mengesahkan… · Verifying…"
-            : "Sahkan · Verify"}
-      </Button>
-
-      {stage === "code" && (
-        <button
-          type="button"
-          onClick={() => {
-            setStage("email");
-            setCode("");
-            setError(null);
-          }}
-          className="-mt-4 text-center text-sm text-ink-70 underline underline-offset-2"
-        >
-          Tukar e-mel · Change email
-        </button>
-      )}
-
-      <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="type-eyebrow text-[0.6875rem]">ATAU · OR</span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
-
-      {/* Google OAuth (PKCE → /auth/callback). Enabled once the provider is on in
-          Supabase; guest mode (no env) disables it. */}
+      {/* Google OAuth (PKCE → /auth/callback). Guest mode (no env) disables it. */}
       <Button
         type="button"
         variant="outline"
         onClick={handleGoogle}
         disabled={pending || !configured}
-        className="h-11 gap-2 rounded-xl border-line bg-card text-ink hover:bg-surface-2 disabled:opacity-60"
+        className="h-12 gap-2 rounded-xl border-line bg-card text-ink hover:bg-surface-2 disabled:opacity-60"
       >
         <GoogleG />
-        Teruskan dengan Google · Continue with Google
+        {pending
+          ? "Menyambung… · Connecting…"
+          : "Teruskan dengan Google · Continue with Google"}
       </Button>
 
       {!configured && (
@@ -244,7 +133,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {copy.swapCta}
         </Link>
       </p>
-    </form>
+    </div>
   );
 }
 

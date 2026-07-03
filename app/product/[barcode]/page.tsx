@@ -6,6 +6,7 @@ import {
   logScan,
 } from "@/lib/api";
 import { VerdictDetail } from "@/components/nyata/verdict-detail";
+import { BackBar } from "@/components/nyata/back-bar";
 
 export default async function ProductPage({
   params,
@@ -22,5 +23,10 @@ export default async function ProductPage({
     getVerdict(barcode),
     getRecallsForProduct(product),
   ]);
-  return <VerdictDetail product={product} verdict={verdict} recalls={recalls} />;
+  return (
+    <div className="bg-paper">
+      <BackBar fallback="/feed" />
+      <VerdictDetail product={product} verdict={verdict} recalls={recalls} />
+    </div>
+  );
 }
