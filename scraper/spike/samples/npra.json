@@ -1,0 +1,22 @@
+{
+  "source": "NPRA",
+  "source_label": "NPRA",
+  "title": "Clindamycin Hydrochloride (Oral Capsules): Risk of Oesophagitis and Oesophageal Ulcer",
+  "product": "Clindamycin Hydrochloride (Oral Capsules): Risk of Oesophagitis and Oesophageal Ulcer",
+  "brand": "",
+  "reason": "NPRA drug-safety alert (pharmacovigilance signal); see official article.",
+  "date": "2026-05-13",
+  "severity": "elak",
+  "official_url": "https://www.npra.gov.my/index.php/en/component/content/article/475-english/safety-alerts-main/safety-alerts-2026/1527851-clindamycin-hydrochloride-oral-capsules-risk-of-oesophagitis-and-oesophageal-ulcer.html?Itemid=1391",
+  "match_brand": null,
+  "match_product": "clindamycin hydrochloride oral capsules risk of oesophagitis and oesophageal ulcer",
+  "match_barcode": null,
+  "_tool": "requests+parser",
+  "_selectors": {
+    "listing": "https://www.npra.gov.my/index.php/en/health-professionals/safety-alertsen.html",
+    "article_link": "a[href*=\"safety-alerts-main\"]",
+    "date": "article page <time datetime> / .published span"
+  },
+  "_reachable": true,
+  "_notes": "NPRA Joomla safety-alerts index; article link + published date both server-rendered (static)."
+}
