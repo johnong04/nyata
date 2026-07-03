@@ -144,3 +144,34 @@ scan history; push notifications on new recalls for products you scanned.
 - Env: `OPENFOODFACTS` (none/public), Supabase URL+keys, the AI provider key, `TOYYIBPAY_*`, `STRIPE_*`.
 - Reuse the existing **Scrapling** setup from the hack-ideation repo for the recall scraper.
 - Verify firecrawl/Scrapling can reach mySAFE/MOH/NPRA pages early (D1 spike) - that data is load-bearing.
+
+---
+
+## 11. Run-2 decisions (finalized 2026-07-04) — data architecture, legal posture, scan UX
+
+> Supersedes/extends §2, §6, §8 where they conflict. Read before building any Run-2 slice.
+
+### 11.1 Product stance (load-bearing)
+Nyata is a **useful consumer-watchdog operating deliberately and responsibly in a legal grey area** — **NOT a justice-warrior** authoring brand accusations. Show cited facts + attributed third-party reports; **let the user decide**. Be *useful* over *righteous*. This resolves every "how bold can we be" question: attributed + hedged + linked = yes; Nyata's own definitive brand verdict = no.
+
+### 11.2 Legal posture (hard rules, all data-integrity/prod rigor)
+- **Verdict (numeric rating + band) = INGREDIENT-ONLY**, grounded on the curated hazard table (B1). Defensible as facts about contents. Never driven by news/social.
+- **"On the record" dossier = attributed · hedged · credibility-gated** third-party reports (research/news/social). Hedged advice ("some sources report X; you may wish to consider alternatives") is OK; a hard Nyata brand-safety claim is not.
+- **Safeguards (hard acceptance criteria):** attribution + working link on every claim · AI credibility-gate (named reputable source only) + small trusted-domain backstop (a *floor, not a fence* — whole web is searched) · disclaimer · "report this / right-of-reply" link · no private individuals. **No manual per-row approval** (velocity) — the AI gate + attribution + takedown carry it.
+- Basis: MY Defamation Act 1957 (truth + fair-comment on public-interest matters) + *Walters v. OpenAI* (2025: disclaimers/attribution/responsible-design/no-malice defeat AI-defamation). MY is plaintiff-friendly → residual SLAPP risk accepted, mitigated by the above.
+- **Recalls:** official sources only, republish + link, neutral language (§6 unchanged).
+
+### 11.3 Three data systems
+- **A — product + verdict** (per scan, organic): OFF REST API (barcode) **or** Gemini OCR (photo) → AI verdict **grounded on B1**. Cached in `products` / `verdicts`. No scraping.
+- **B1 — curated hazard table** (built once, VERIFIED): `ingredient/E-number → classification · authority · verbatim_quote · url · jurisdiction`. **`jurisdiction` captures cross-country gaps** (e.g. "allowed MY, banned EU" — E171 titanium dioxide, potassium bromate, BVO). Anti-hallucination = **every row has a live, re-fetched link + verbatim quote; rows whose link 404s or doesn't back the claim are dropped** (hard criterion). Built via WebSearch + Firecrawl/WebFetch + `/deep-research`; **customized to hazardous ingredients common in MY food**.
+- **B2 — live dossier** (new `dossiers` table; Supabase text, free-tier-fine): **runtime** = single **Gemini Google-Search-grounded** call (web), cached per brand/product. **Pre-warm ~50 popular MY brands at build-time** via agentic pass (`last30days` social + web + Firecrawl). Appears as attributed source cards + hedged summary + credibility labels. No DeepSeek; no agent-reach (install overhead).
+- **C — official recalls**: **Scrapling** scrapes MOH/mySAFE/NPRA → `recalls` table, matched brand+name. **Spike reachability first (S3); degrade to the 4 seeds if red.** Scrapling's *only* job.
+
+### 11.4 Scan identity flow
+Barcode = unique **cache/dedup KEY, not a name**. Matrix: OFF-hit → 0 photos · OFF-miss first-discovery → back (ingredients) + front (name), cache under barcode · **later users → barcode only (1 take)** · no barcode → front+back, name-key. **Native camera-capture for sharp OCR photos; live video for barcode only.** Adaptive **hologram scan-guide** overlay: barcode → "snap the ingredients" → "snap the front for recalls & news".
+
+### 11.5 Personalization
+Closed **template chips** (diabetic/pregnant/kid/nuts/dairy/gluten/soy/shellfish/HBP — no free-text). **`members jsonb`** on `profiles` (self + kids). Scan-time **"who's this for?"** selector → verdict re-flags per member. **Premium-gated with a STUB unlock** (real payments deferred to a later run).
+
+### 11.6 AI / tooling
+Gemini free API (Google-Search grounding + OCR + verdict); verdict/dossier caches protect quota. Firecrawl = build-time fetch/verify. `last30days` = social gathering (build-time, pre-warm). `/deep-research` = the hazard-ingredient + popular-brand research. UI slices **must invoke `/frontend-design` + `/web-animation-design`**.
