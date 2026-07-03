@@ -15,6 +15,7 @@
  */
 
 import type {
+  Dossier,
   FeedFilter,
   FeedItem,
   Product,
@@ -39,6 +40,8 @@ import {
   getProductByBarcodeReal,
   getVerdictReal,
   getVerdictFromPhotos as getVerdictFromPhotosReal,
+  getDossierReal,
+  getDossierCachedReal,
 } from "@/lib/api-server";
 
 // ---------------------------------------------------------------------------
@@ -291,6 +294,35 @@ export async function saveProfile(conditions: string[]): Promise<void> {
     () => {
       MOCK_PROFILE.conditions = conditions;
     },
+  );
+}
+
+/**
+ * "On the record" dossier for a brand — attributed, hedged, credibility-gated
+ * third-party reports (specs §11.2). NEVER influences the numeric verdict.
+ * On-demand ("dig deeper"): live grounded call, cached per brand. Null = honest
+ * empty state (nothing on record / no key / all sources failed the gate).
+ */
+export async function getDossier(input: {
+  brand: string;
+  name: string;
+  barcode?: string;
+}): Promise<Dossier | null> {
+  return withFallback(
+    () => getDossierReal(input),
+    () => null, // honest empty; never fabricate an attributed claim
+    { timeoutMs: 25000 }, // grounded search is slower than a lookup
+  );
+}
+
+/** Cache-only dossier read (no AI spend) — for the product page + share badge. */
+export async function getDossierCached(input: {
+  brand: string;
+  name: string;
+}): Promise<Dossier | null> {
+  return withFallback(
+    () => getDossierCachedReal(input),
+    () => null,
   );
 }
 

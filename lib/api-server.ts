@@ -14,7 +14,7 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
+import type { Dossier, Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
@@ -23,6 +23,10 @@ import {
   getProductByBarcode as getProductByBarcodeEngine,
   getVerdict as getVerdictEngine,
 } from "@/lib/verdict";
+import {
+  getDossier as getDossierEngine,
+  getDossierCached as getDossierCachedEngine,
+} from "@/lib/dossier";
 
 const ALLOWED_CONDITIONS = ["allergy", "diabetic", "pregnant", "kid"] as const;
 
@@ -91,6 +95,23 @@ function syntheticBarcode(dataUrl: string): string {
     h = ((h << 5) + h + dataUrl.charCodeAt(i)) | 0;
   }
   return "ocr-" + (h >>> 0).toString(16).padStart(8, "0");
+}
+
+/** Real dossier (cache → grounded Gemini). Null = nothing on record / no key. Never throws. */
+export async function getDossierReal(input: {
+  brand: string;
+  name: string;
+  barcode?: string;
+}): Promise<Dossier | null> {
+  return getDossierEngine(input);
+}
+
+/** Cache-only dossier read (no AI spend). Null when not pre-warmed/cached. */
+export async function getDossierCachedReal(input: {
+  brand: string;
+  name: string;
+}): Promise<Dossier | null> {
+  return getDossierCachedEngine(input);
 }
 
 /** Current user's profile, or null when guest / unauthenticated. */
