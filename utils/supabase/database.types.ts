@@ -16,6 +16,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      dossiers: {
+        Row: {
+          brand_key: string
+          created_at: string
+          id: string
+          model: string | null
+          prewarmed: boolean
+          product_barcode: string | null
+          sources: Json
+          summary_bm: string
+          summary_en: string
+          updated_at: string
+        }
+        Insert: {
+          brand_key: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          prewarmed?: boolean
+          product_barcode?: string | null
+          sources?: Json
+          summary_bm: string
+          summary_en: string
+          updated_at?: string
+        }
+        Update: {
+          brand_key?: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          prewarmed?: boolean
+          product_barcode?: string | null
+          sources?: Json
+          summary_bm?: string
+          summary_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ingredient_hazards: {
         Row: {
           aliases: string[]

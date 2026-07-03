@@ -93,6 +93,24 @@ export interface Profile {
   is_premium: boolean;
 }
 
+/** One attributed source card in a dossier (§11.2: named source + working link). */
+export interface DossierSource {
+  source_name: string;
+  credibility_label: "high" | "med" | "low";
+  verbatim_snippet: string;
+  url: string;
+  date: string; // ISO or "" if unknown
+}
+
+/** A brand's "On the record" dossier — attributed, hedged, credibility-gated. */
+export interface Dossier {
+  brand_key: string;
+  summary_en: string;
+  summary_bm: string;
+  sources: DossierSource[];
+  prewarmed: boolean;
+}
+
 /** Map a 0–10 risk score → verdict band (design-system §3). */
 export function bandForRating(rating: number): VerdictBand {
   if (rating < 4) return "SELAMAT";
