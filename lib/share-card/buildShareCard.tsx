@@ -333,8 +333,7 @@ export function buildShareCard(data: ShareCardData): ReactElement {
                 key={i}
                 style={{
                   display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
+                  flexDirection: "column",
                   backgroundColor: SURFACE_2,
                   borderBottom: `2px solid ${LINE}`,
                   padding: "11px 24px",
@@ -343,46 +342,67 @@ export function buildShareCard(data: ShareCardData): ReactElement {
                 <div
                   style={{
                     display: "flex",
-                    width: 16,
-                    height: 16,
-                    borderRadius: 8,
-                    backgroundColor: verdictColor(h.token),
-                    marginRight: 20,
-                  }}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontWeight: 700,
-                    fontSize: 26,
-                    color: INK,
-                    width: 110,
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  {h.code}
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      backgroundColor: verdictColor(h.token),
+                      marginRight: 20,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontWeight: 700,
+                      fontSize: 26,
+                      color: INK,
+                      width: 110,
+                    }}
+                  >
+                    {h.code}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 26,
+                      color: INK_70,
+                      flexGrow: 1,
+                    }}
+                  >
+                    {h.name}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 22,
+                      color: INK_40,
+                    }}
+                  >
+                    {h.flag}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontSize: 26,
-                    color: INK_70,
-                    flexGrow: 1,
-                  }}
-                >
-                  {h.name}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontSize: 22,
-                    color: INK_40,
-                  }}
-                >
-                  {h.flag}
-                </div>
+                {h.jurisdiction ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 20,
+                      color: REVEAL,
+                      marginTop: 4,
+                    }}
+                  >
+                    ⚑ {h.jurisdiction}
+                  </div>
+                ) : null}
               </div>
             ))}
             {hazards.length > 2 ? (
