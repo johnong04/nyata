@@ -11,20 +11,24 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getProductByBarcode, getVerdictFromPhoto } from "@/lib/api";
+import { getProductByBarcode, getVerdictFromPhotos } from "@/lib/api";
 import { makeDetector, detectBarcode } from "@/lib/barcode";
 import { fileToDownscaledDataUrl } from "@/lib/image";
 import { Reticle } from "@/components/scan/reticle";
 import { Analyzing } from "@/components/scan/analyzing";
 import { ScanControls, NoCameraFallback } from "@/components/scan/scan-controls";
+import { ScanGuide } from "@/components/scan/scan-guide";
 import { OcrFailed } from "@/components/scan/ocr-failed";
 
-// idle → scanning → analyzing → route out. "reading" is the OCR twin of
-// "analyzing"; "ocr-failed" is its friendly retry dead-stop. "error" = no camera.
+// idle → scanning → analyzing → route out (OFF hit) OR analyzing → capture-back →
+// capture-front → reading → route out (OFF miss / snap). "reading" is the OCR twin
+// of "analyzing"; "ocr-failed" is its friendly retry dead-stop. "error" = no camera.
 type ScanState =
   | "idle"
   | "scanning"
   | "analyzing"
+  | "capture-back"
+  | "capture-front"
   | "reading"
   | "ocr-failed"
   | "error";
@@ -45,6 +49,13 @@ export function ScanClient() {
   // The OCR round-trip promise the "reading" loader waits on, and where it lands.
   const ocrRef = useRef<Promise<{ barcode: string; ok: boolean }> | null>(null);
   const ocrResultRef = useRef<{ barcode: string; ok: boolean } | null>(null);
+  // OFF-miss branch: the barcode we're capturing photos for (null = pure snap,
+  // synthetic key), plus the downscaled photos.
+  const captureBarcode = useRef<string | null>(null);
+  const backPhoto = useRef<string | null>(null);
+  const frontPhoto = useRef<string | null>(null);
+  const productHit = useRef(false);
+  const lookupRef = useRef<Promise<unknown> | null>(null);
 
   /** Stop every media track and cancel the detection loop. Idempotent. */
   const stopCamera = useCallback(() => {
@@ -62,10 +73,21 @@ export function ScanClient() {
     (barcode: string) => {
       if (state === "analyzing") return;
       pendingBarcode.current = barcode;
+      captureBarcode.current = barcode;
       // Free the camera BEFORE leaving — a leaked camera light looks broken on film.
       stopCamera();
-      // Kick the lookup in parallel with the loader (perceived-latency cover).
-      void getProductByBarcode(barcode).catch(() => null);
+      productHit.current = false;
+      // Resolve product WHILE the loader plays; the loader's waitFor gate holds
+      // onComplete until this settles, then we branch hit → route / miss → capture.
+      lookupRef.current = getProductByBarcode(barcode)
+        .then((p) => {
+          productHit.current = Boolean(p);
+          return p;
+        })
+        .catch(() => {
+          productHit.current = false;
+          return null;
+        });
       setState("analyzing");
     },
     [state, stopCamera]
@@ -74,39 +96,72 @@ export function ScanClient() {
   const onAnalyzeComplete = useCallback(() => {
     const barcode = pendingBarcode.current;
     if (!barcode) return;
-    router.push(`/product/${encodeURIComponent(barcode)}`);
+    if (productHit.current) {
+      router.push(`/product/${encodeURIComponent(barcode)}`);
+    } else {
+      // OFF miss → guided first-discovery capture, cached under the real barcode.
+      backPhoto.current = null;
+      frontPhoto.current = null;
+      setState("capture-back");
+    }
   }, [router]);
 
   /**
-   * OCR fallback: user picks/snaps a label photo. Downscale it client-side,
-   * kick the vision+AI round-trip in parallel with the loader, then route to the
-   * synthetic product page — or, if the label was unreadable, drop to a friendly
-   * retry instead of a dead-end 404.
+   * Fire the photo→verdict round-trip (back photo, optional front photo, cached
+   * under the real barcode when we have one, else a synthetic key). The "reading"
+   * loader's waitFor gate holds the un-redaction until this settles.
    */
-  const onLabelPhoto = useCallback(
+  const runPhotoVerdict = useCallback(() => {
+    ocrResultRef.current = null;
+    const run = getVerdictFromPhotos({
+      barcode: captureBarcode.current ?? undefined,
+      backPhoto: backPhoto.current ?? undefined,
+      frontPhoto: frontPhoto.current ?? undefined,
+    })
+      .then((res) => {
+        ocrResultRef.current = res;
+        return res;
+      })
+      .catch(() => {
+        const res = { barcode: "", ok: false };
+        ocrResultRef.current = res;
+        return res;
+      });
+    ocrRef.current = run;
+    setState("reading");
+  }, []);
+
+  /**
+   * Back-photo handler — shared by the guide's back phase AND ScanControls'
+   * snap/gallery. When there's no barcode (pure snap), captureBarcode stays null →
+   * synthetic key. Advances to the front-photo phase.
+   */
+  const onBackPhoto = useCallback(async (file: File) => {
+    stopCamera();
+    try {
+      backPhoto.current = await fileToDownscaledDataUrl(file);
+    } catch {
+      backPhoto.current = null;
+    }
+    setState("capture-front");
+  }, [stopCamera]);
+
+  const onFrontPhoto = useCallback(
     async (file: File) => {
-      if (state === "reading" || state === "analyzing") return;
-      stopCamera();
-      ocrResultRef.current = null;
-      // Start the (potentially slow) work now; the loader's waitFor gate holds
-      // the un-redaction until this settles.
-      const run = (async () => {
-        try {
-          const dataUrl = await fileToDownscaledDataUrl(file);
-          const res = await getVerdictFromPhoto(dataUrl);
-          ocrResultRef.current = res;
-          return res;
-        } catch {
-          const res = { barcode: "", ok: false };
-          ocrResultRef.current = res;
-          return res;
-        }
-      })();
-      ocrRef.current = run;
-      setState("reading");
+      try {
+        frontPhoto.current = await fileToDownscaledDataUrl(file);
+      } catch {
+        frontPhoto.current = null;
+      }
+      runPhotoVerdict();
     },
-    [state, stopCamera],
+    [runPhotoVerdict],
   );
+
+  const onSkipFront = useCallback(() => {
+    frontPhoto.current = null;
+    runPhotoVerdict();
+  }, [runPhotoVerdict]);
 
   const onReadComplete = useCallback(() => {
     const res = ocrResultRef.current;
@@ -218,7 +273,7 @@ export function ScanClient() {
           <Reticle />
           <ScanControls
             onBarcode={onBarcode}
-            onLabelPhoto={onLabelPhoto}
+            onBackPhoto={onBackPhoto}
             torchSupported={torchSupported}
             torchOn={torchOn}
             onToggleTorch={toggleTorch}
@@ -227,10 +282,22 @@ export function ScanClient() {
       )}
 
       {state === "error" && (
-        <NoCameraFallback onBarcode={onBarcode} onLabelPhoto={onLabelPhoto} />
+        <NoCameraFallback onBarcode={onBarcode} onBackPhoto={onBackPhoto} />
       )}
 
-      {state === "analyzing" && <Analyzing onComplete={onAnalyzeComplete} />}
+      {state === "analyzing" && (
+        <Analyzing
+          waitFor={lookupRef.current ?? undefined}
+          onComplete={onAnalyzeComplete}
+        />
+      )}
+
+      {state === "capture-back" && (
+        <ScanGuide phase="back" onPhoto={onBackPhoto} />
+      )}
+      {state === "capture-front" && (
+        <ScanGuide phase="front" onPhoto={onFrontPhoto} onSkip={onSkipFront} />
+      )}
 
       {state === "reading" && (
         <Analyzing
@@ -243,7 +310,7 @@ export function ScanClient() {
       {state === "ocr-failed" && (
         <OcrFailed
           onRetry={() => setState("scanning")}
-          onLabelPhoto={onLabelPhoto}
+          onBackPhoto={onBackPhoto}
         />
       )}
     </div>

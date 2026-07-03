@@ -18,10 +18,10 @@ import { Input } from "@/components/ui/input";
  * read off its printed ingredient list. Styled to match the mono control chrome.
  */
 export function SnapLabelButton({
-  onLabelPhoto,
+  onPhoto,
   className = "",
 }: {
-  onLabelPhoto: (file: File) => void;
+  onPhoto: (file: File) => void;
   className?: string;
 }) {
   return (
@@ -40,23 +40,66 @@ export function SnapLabelButton({
           const file = e.target.files?.[0];
           // Reset so re-picking the same file still fires onChange.
           e.target.value = "";
-          if (file) onLabelPhoto(file);
+          if (file) onPhoto(file);
         }}
       />
     </label>
   );
 }
 
+/**
+ * GalleryButton — the gallery twin of SnapLabelButton. Same file input but NO
+ * `capture` attribute, so it opens the photo library instead of the camera.
+ */
+export function GalleryButton({
+  onPhoto,
+  className = "",
+}: {
+  onPhoto: (file: File) => void;
+  className?: string;
+}) {
+  return (
+    <label
+      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
+    >
+      <GalleryIcon />
+      Muat naik · Upload photo
+      <input
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        aria-label="Upload a product photo from your library"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = ""; // re-pick same file still fires onChange
+          if (file) onPhoto(file);
+        }}
+      />
+    </label>
+  );
+}
+
+function GalleryIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75}
+      strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="m21 15-5-5L5 21" />
+    </svg>
+  );
+}
+
 export function ScanControls({
   onBarcode,
-  onLabelPhoto,
+  onBackPhoto,
   torchSupported,
   torchOn,
   onToggleTorch,
   autoFocusManual = false,
 }: {
   onBarcode: (barcode: string) => void;
-  onLabelPhoto: (file: File) => void;
+  onBackPhoto: (file: File) => void;
   torchSupported: boolean;
   torchOn: boolean;
   onToggleTorch: () => void;
@@ -101,8 +144,11 @@ export function ScanControls({
         </form>
       )}
 
-      {/* Always-visible OCR escape hatch: works even when the barcode won't. */}
-      <SnapLabelButton onLabelPhoto={onLabelPhoto} className="w-full" />
+      {/* OCR escape hatch: camera snap OR gallery upload — works when the barcode won't. */}
+      <div className="flex gap-2">
+        <SnapLabelButton onPhoto={onBackPhoto} className="flex-1" />
+        <GalleryButton onPhoto={onBackPhoto} className="flex-1" />
+      </div>
 
       <div className="flex items-center justify-center gap-3">
         {!manualOpen && (
@@ -144,10 +190,10 @@ export function ScanControls({
  */
 export function NoCameraFallback({
   onBarcode,
-  onLabelPhoto,
+  onBackPhoto,
 }: {
   onBarcode: (barcode: string) => void;
-  onLabelPhoto: (file: File) => void;
+  onBackPhoto: (file: File) => void;
 }) {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -196,7 +242,10 @@ export function NoCameraFallback({
       <span className="my-5 font-mono text-xs uppercase tracking-widest text-paper/40">
         atau · or
       </span>
-      <SnapLabelButton onLabelPhoto={onLabelPhoto} />
+      <div className="flex w-full max-w-xs gap-2">
+        <SnapLabelButton onPhoto={onBackPhoto} className="flex-1" />
+        <GalleryButton onPhoto={onBackPhoto} className="flex-1" />
+      </div>
     </div>
   );
 }
