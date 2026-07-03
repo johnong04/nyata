@@ -11,11 +11,11 @@
     "kind": "additive",
     "classification": "no longer considered safe as a food additive",
     "authority": "EFSA",
-    "verbatim_quote": "It was banned as a food additive by the European Union in 2022, after the European Food Safety Authority (EFSA) raised concerns about its safety.",
-    "source_url": "https://en.wikipedia.org/wiki/Titanium_dioxide",
+    "verbatim_quote": "titanium dioxide can no longer be considered safe as a food additive",
+    "source_url": "https://www.efsa.europa.eu/en/news/titanium-dioxide-e171-no-longer-considered-safe-when-used-food-additive",
     "jurisdiction": "Permitted in Malaysia; banned as a food additive in the EU since 2022.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Potassium bromate",
@@ -32,7 +32,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Potassium_bromate",
     "jurisdiction": "Banned in the EU, UK and Canada; discouraged in the US; still used in some Malaysian bakery flour.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Brominated vegetable oil",
@@ -43,12 +43,12 @@
     "e_number": null,
     "kind": "additive",
     "classification": "emulsifier banned from food and drink in several countries",
-    "authority": "Health Canada",
-    "verbatim_quote": "Canada has banned the use of brominated vegetable oil since August 30, 2024.",
-    "source_url": "https://en.wikipedia.org/wiki/Brominated_vegetable_oil",
+    "authority": "US FDA",
+    "verbatim_quote": "The agency concluded that the intended use of BVO in food is no longer considered safe after the results of studies conducted in collaboration with the National Institutes of Health (NIH) found the potential for adverse health effects in humans.",
+    "source_url": "https://www.fda.gov/food/hfp-constituent-updates/fda-revokes-regulation-allowing-use-brominated-vegetable-oil-bvo-food",
     "jurisdiction": "Banned in Canada (2024), the US (2024) and the EU; may still appear in some citrus soft drinks.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Azodicarbonamide",
@@ -65,7 +65,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Azodicarbonamide",
     "jurisdiction": "Banned as a food additive in the EU and Australia; permitted (limited) in the US and Malaysia.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Butylated hydroxyanisole",
@@ -82,7 +82,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Butylated_hydroxyanisole",
     "jurisdiction": "Permitted as an antioxidant in Malaysia and the US; flagged as a suspected carcinogen and restricted elsewhere.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Butylated hydroxytoluene",
@@ -99,7 +99,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Butylated_hydroxytoluene",
     "jurisdiction": "Permitted in the EU, US and Malaysia; restricted or avoided by some manufacturers over safety concerns.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Sodium nitrite",
@@ -115,7 +115,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Sodium_nitrite",
     "jurisdiction": "Permitted as a curing preservative in Malaysia, the EU and US; IARC links nitrite/processed meat to cancer.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Potassium nitrite",
@@ -131,7 +131,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Potassium_nitrite",
     "jurisdiction": "Permitted as a curing agent in Malaysia and the EU; shares the nitrosamine concern of sodium nitrite.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Tartrazine",
@@ -150,7 +150,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Tartrazine",
     "jurisdiction": "Permitted in Malaysia, EU and US, but the EU requires a hyperactivity warning label the US does not.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Sunset Yellow FCF",
@@ -169,7 +169,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Sunset_Yellow_FCF",
     "jurisdiction": "Permitted in Malaysia, EU and US, but the EU requires a hyperactivity warning label the US does not.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Allura Red AC",
@@ -188,7 +188,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Allura_Red_AC",
     "jurisdiction": "Permitted in Malaysia and the US; approved in the EU only with a mandatory hyperactivity warning label.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Ponceau 4R",
@@ -206,7 +206,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Ponceau_4R",
     "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not approved for food in the US.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Quinoline Yellow WS",
@@ -224,7 +224,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Quinoline_Yellow_WS",
     "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not a permitted food additive in the US or Canada.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Carmoisine",
@@ -242,7 +242,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Azorubine",
     "jurisdiction": "Permitted in Malaysia and the EU (with warning label); not approved for food in the US.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Sodium benzoate",
@@ -258,7 +258,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Sodium_benzoate",
     "jurisdiction": "Permitted in Malaysia, the EU and US; can form benzene in acidic drinks containing vitamin C.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Aspartame",
@@ -270,11 +270,11 @@
     "kind": "additive",
     "classification": "sweetener IARC classifies as possibly carcinogenic",
     "authority": "IARC",
-    "verbatim_quote": "The FDA disagrees with IARC's conclusion that these studies support classifying aspartame as a possible carcinogen to humans.",
-    "source_url": "https://en.wikipedia.org/wiki/Aspartame",
+    "verbatim_quote": "IARC classified aspartame as possibly carcinogenic to humans (IARC Group 2B)",
+    "source_url": "https://www.who.int/news/item/14-07-2023-aspartame-hazard-and-risk-assessment-results-released",
     "jurisdiction": "Permitted in Malaysia, the EU and US; IARC classified it as possibly carcinogenic (Group 2B) in 2023.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Acesulfame potassium",
@@ -292,7 +292,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Acesulfame_potassium",
     "jurisdiction": "Permitted in Malaysia, the EU and US; EFSA has been asked to re-evaluate its safety.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Monosodium glutamate",
@@ -306,11 +306,11 @@
     "kind": "additive",
     "classification": "flavour enhancer permitted subject to quantitative limits",
     "authority": "EFSA",
-    "verbatim_quote": "The European Union classifies it as a food additive permitted in certain foods and subject to quantitative limits.",
-    "source_url": "https://en.wikipedia.org/wiki/Monosodium_glutamate",
+    "verbatim_quote": "a group acceptable daily intake (ADI) of 30 mg/kg body weight per day",
+    "source_url": "https://www.efsa.europa.eu/en/press/news/170712",
     "jurisdiction": "Permitted in Malaysia and the US; the EU sets a group ADI and quantitative limits on its use.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "High-fructose corn syrup",
@@ -328,7 +328,7 @@
     "source_url": "https://en.wikipedia.org/wiki/High-fructose_corn_syrup",
     "jurisdiction": "Widely used in the US; production in the EU was capped by isoglucose quotas until 2017.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Carrageenan",
@@ -345,7 +345,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Carrageenan",
     "jurisdiction": "Permitted in Malaysia, the EU and US; the EU applies precautionary limits for infant formula.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Propylparaben",
@@ -362,7 +362,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Propylparaben",
     "jurisdiction": "No longer permitted as a food additive in the EU; still used in some products in the US and elsewhere.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Sulphur dioxide",
@@ -380,7 +380,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Sulfur_dioxide",
     "jurisdiction": "Permitted as a preservative in Malaysia, the EU and US, but the EU sets much lower limits than the US.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Sodium cyclamate",
@@ -397,7 +397,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Sodium_cyclamate",
     "jurisdiction": "Permitted in Malaysia and the EU; banned as a food additive in the US since 1969.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Saccharin",
@@ -413,7 +413,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Saccharin",
     "jurisdiction": "Permitted in Malaysia, the EU and US; was banned in Canada and carried a US warning label for decades.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Erythrosine",
@@ -428,11 +428,11 @@
     "kind": "additive",
     "classification": "colour banned from many US uses over carcinogenicity",
     "authority": "US FDA",
-    "verbatim_quote": "in all uses as its lake variant have been banned by the Food and Drug Administration (FDA) since 1990",
-    "source_url": "https://en.wikipedia.org/wiki/Erythrosine",
+    "verbatim_quote": "The FDA is revoking the authorization for the use of FD&C Red No. 3 as a matter of law, based on the Delaney Clause of the Federal Food, Drug, and Cosmetic Act (FD&C Act)",
+    "source_url": "https://www.fda.gov/food/hfp-constituent-updates/fda-revoke-authorization-use-red-no-3-food-and-ingested-drugs",
     "jurisdiction": "Permitted in Malaysia and the EU; the US banned the lake form in 1990 and revoked remaining food uses in 2025.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Propyl gallate",
@@ -448,7 +448,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Propyl_gallate",
     "jurisdiction": "Generally recognised as safe in the US; restricted or banned as a food additive in some other countries.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Potassium sorbate",
@@ -464,7 +464,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Potassium_sorbate",
     "jurisdiction": "Permitted as a preservative in Malaysia, the EU and US; among the more benign synthetic preservatives.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Trans fat",
@@ -478,11 +478,11 @@
     "kind": "contaminant",
     "classification": "industrial trans fat banned from the US food supply",
     "authority": "US FDA",
-    "verbatim_quote": "First, in 2013 the FDA announced it planned to completely ban artificial trans fat in the form of partially hydrogenated oil.",
-    "source_url": "https://en.wikipedia.org/wiki/Trans_fat",
+    "verbatim_quote": "In 2015, FDA released its final determination that Partially Hydrogenated Oils (PHOs) are not Generally Recognized as Safe (GRAS)",
+    "source_url": "https://www.fda.gov/food/food-additives-petitions/final-determination-regarding-partially-hydrogenated-oils-removing-trans-fat",
     "jurisdiction": "Industrial trans fat (partially hydrogenated oil) banned in the US and restricted by the WHO; still found in some Malaysian products.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Indigo carmine",
@@ -502,7 +502,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Indigo_carmine",
     "jurisdiction": "Permitted in Malaysia, the EU and US, but the EU requires a hyperactivity warning label the US does not.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Fast Green FCF",
@@ -521,7 +521,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Fast_Green_FCF",
     "jurisdiction": "Approved for food in the US; not permitted as a food colour in the EU.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Brilliant Blue FCF",
@@ -540,7 +540,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Brilliant_Blue_FCF",
     "jurisdiction": "Permitted in Malaysia, the EU and US; the EU requires a hyperactivity warning label the US does not.",
     "severity": "low",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Amaranth",
@@ -559,7 +559,7 @@
     "source_url": "https://en.wikipedia.org/wiki/Amaranth_(dye)",
     "jurisdiction": "Permitted in Malaysia and the EU (with warning label); banned as a food colour in the US since 1976.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Red 2G",
@@ -572,11 +572,11 @@
     "kind": "additive",
     "classification": "azo dye suspended as a food colour in the EU",
     "authority": "EFSA",
-    "verbatim_quote": "In the European Union, Red 2G was used as a food dye ( E number E128).",
-    "source_url": "https://en.wikipedia.org/wiki/Red_2G",
+    "verbatim_quote": "Red 2G has been shown to convert largely in the body into a substance, called aniline",
+    "source_url": "https://www.efsa.europa.eu/en/news/efsa-re-evaluates-safety-food-colours-and-adopts-first-opinion-food-colour-red",
     "jurisdiction": "Suspended as a food colour in the EU since 2007 over safety concerns; never approved in the US.",
     "severity": "high",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   },
   {
     "ingredient": "Olestra",
@@ -593,6 +593,6 @@
     "source_url": "https://en.wikipedia.org/wiki/Olestra",
     "jurisdiction": "Approved as a food additive in the US; not authorised in the EU, UK or Canada.",
     "severity": "med",
-    "verified_at": "2026-07-03T18:32:18.900Z"
+    "verified_at": "2026-07-03T22:29:37.401Z"
   }
 ]

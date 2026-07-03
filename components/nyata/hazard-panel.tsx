@@ -20,6 +20,22 @@ const SEV_LABEL: Record<string, string> = {
   selamat: "RENDAH · LOW",
 };
 
+/**
+ * Honest source attribution. A Wikipedia link must NEVER read as an official
+ * {authority} link — so a wikipedia.org host renders "per Wikipedia · cites
+ * {authority}", while a primary authority page renders "{authority} · {domain}".
+ */
+function sourceAttribution(authority: string, sourceUrl: string): string {
+  let host = "";
+  try {
+    host = new URL(sourceUrl).hostname.replace(/^www\./, "");
+  } catch {
+    host = sourceUrl;
+  }
+  const isPrimary = !/(^|\.)wikipedia\.org$/i.test(host);
+  return isPrimary ? `${authority} · ${host}` : `per Wikipedia · cites ${authority}`;
+}
+
 export function HazardPanel({ flags }: { flags: Flag[] }) {
   if (!flags || flags.length === 0) {
     return (
@@ -70,7 +86,7 @@ export function HazardPanel({ flags }: { flags: Flag[] }) {
                     rel="noopener noreferrer"
                     className="mt-1 block font-mono text-xs text-ink-40 underline underline-offset-2 break-all"
                   >
-                    {f.jurisdiction.authority} · {f.jurisdiction.source_url}
+                    {sourceAttribution(f.jurisdiction.authority, f.jurisdiction.source_url)}
                   </a>
                 </div>
               )}
