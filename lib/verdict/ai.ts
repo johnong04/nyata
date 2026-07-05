@@ -1,10 +1,10 @@
 import "server-only";
-import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import type { Product } from "@/lib/types";
 import { getHazards } from "@/lib/hazards/store";
 import { normalize } from "@/lib/recalls/normalize";
 import { verdictModelSchema, type VerdictModel } from "./schema";
+import { aiModel, OCR_MODEL_ID } from "./model";
 
 /**
  * GUARDRAIL 1 — AI verdict with validate-before-trust.
@@ -17,7 +17,7 @@ import { verdictModelSchema, type VerdictModel } from "./schema";
  * applied by the caller (copy.ts) — this file authors FACTS only.
  */
 
-export const MODEL_ID = "gemini-2.5-flash";
+export const MODEL_ID = OCR_MODEL_ID;
 
 export class VerdictSchemaError extends Error {
   constructor(message: string) {
@@ -78,7 +78,7 @@ function buildPrompt(product: Product): string {
 
 async function callModel(prompt: string, retryNudge = false): Promise<unknown> {
   const result = await generateObject({
-    model: google(MODEL_ID),
+    model: aiModel(),
     schema: verdictModelSchema,
     system: retryNudge
       ? SYSTEM_PROMPT +

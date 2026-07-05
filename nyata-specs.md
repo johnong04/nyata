@@ -178,3 +178,54 @@ Closed **template chips** (diabetic/pregnant/kid/nuts/dairy/gluten/soy/shellfish
 
 ### 11.7 Status (Run 2 shipped 2026-07-05, `john-run2` → PR #1)
 Live in Supabase: **74 recalls** (KPDN 43 / NPRA 31) · **34 ingredient_hazards** (7 primary-authority citations, 27 "per Wikipedia · cites {authority}") · **49 pre-warmed dossiers**. Prod env keys set (Gemini + OpenRouter). Recall scraper populates via `python scraper/recalls.py` (MOH skipped — dead source, no fallback).
+
+---
+
+## 12. Product roadmap — V1 today, V2/V3 next
+
+> **Current version: V1 (food safety).** Everything above this section is V1. V2/V3 below are the
+> explicit future roadmap — NOT built yet, not in scope for the house.
+> **Portfolio thesis:** Nyata is the **trust layer for food in Muslim-majority SEA** — one persona (the
+> health-anxious Malaysian household decision-maker), one gesture (scan), expanding surfaces.
+> **V1 acquires, V2 monetizes, V3 expands.** "Nyata = revealed" holds across all three.
+
+### V1's honest role — trust, distribution, data (not the money-maker)
+Safety scanning is deliberately a low-frequency wedge: a product is scanned once and cached. V1's assets
+are **distribution** (viral verdict cards in a market where halal doubt and recalls are emotionally
+charged) and **data** (every scan grows the Malaysian product + hazard graph nobody else has). The
+personal-profile paywall proves willingness-to-pay; the recurring business arrives in V2.
+
+### V2 — Nutrition & the proactive sugar-watch agent (the business)
+- **Same scan, two layers — no toggle.** Every scan returns the safety verdict first (the instant hook,
+  unchanged from V1) and *also* extracts calories/macros. An "I'm eating this" tap logs it to a daily
+  diary. One gesture, zero added friction; safety acquires the user, nutrition retains them daily.
+- **Photo-of-plate estimation is a core requirement, not stretch.** Malaysians eat unpackaged food —
+  mamak, hawker, kopitiam — and barcodes only cover groceries. A diary that misses half of what the user
+  eats produces garbage, and an agent advising off garbage is worse than no agent. V2 ships plate-photo
+  calorie/macro estimation alongside barcode scan.
+- **Wedge: sugar/diabetes-first, not generic nutrition.** Malaysia has among the highest adult diabetes
+  prevalence in Asia (~1 in 5 adults). Generic calorie tracking is a knife fight with MyFitnessPal-class
+  apps; **"the proactive sugar-watch agent for Malaysian families"** targets a payer who converts and
+  stays (diabetics, pre-diabetics, and the spouses who worry about them). Generic nutrition is the
+  feature; diabetes is the business.
+- **Proactive AI agent (the subscription):** doesn't wait to be asked. Watches the diary, surfaces gaps
+  ("sodium 40% over, sugar trending up 4 days"), and suggests **realistic Malaysian food choices** —
+  nasi lemak / mamak reality in BM+English, halal-aware — not a Western quinoa bot. This is the
+  recurring-revenue justification V1's one-time unlocks lack.
+- **Gamification (deliberately constrained):** streaks + a weekly shareable "health score" card reusing
+  the V1 verdict-card engine (postable → feeds the attention loop). **No health-state avatar**: food is
+  guilt-laden, and an avatar that sickens when you eat nasi lemak is a shame mechanic — users delete the
+  mirror instead of fixing the diet. If a companion is ever added, it is positive-only (thrives, never
+  decays).
+
+### V3 — Restaurant halal verification (travel)
+- **The scan goes from products to places.** Snap a restaurant — especially overseas — and Nyata checks
+  whether its halal / Muslim-friendly claim actually holds, beyond tourist reviews and hearsay.
+- **Defensible core: certificate verification, not vibe judgment.** JAKIM publishes the registry of
+  recognized foreign halal certification bodies (similarly MUIS SG, etc.). Nyata verifies whether a displayed
+  cert traces to a recognized body — a fact-checkable claim — and layers attributed, credibility-gated
+  third-party reports on top, under the same legal posture as §11.2 (attributed · hedged · linked · never
+  Nyata's own accusation). "Certified by X, which is JAKIM-recognized" / "no recognized certification found —
+  verify locally" — never "this restaurant is lying".
+- **Why it matters:** halal assurance while traveling is a top pain for Muslim travelers, and it takes Nyata
+  beyond Malaysia — the global-market act of the story. Same trust engine, same scan gesture, new surface.

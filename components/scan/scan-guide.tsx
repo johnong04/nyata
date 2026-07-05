@@ -13,14 +13,14 @@ import { SnapLabelButton, GalleryButton } from "@/components/scan/scan-controls"
 
 const COPY = {
   back: {
-    eyebrow: "LANGKAH 1 · STEP 1",
-    title: "Imbas senarai bahan · Snap the ingredients",
-    sub: "Belakang produk · Back of the pack",
+    eyebrow: "STEP 1",
+    title: "Snap the ingredients",
+    sub: "Back of the pack",
   },
   front: {
-    eyebrow: "LANGKAH 2 · STEP 2",
-    title: "Imbas depan produk · Snap the front",
-    sub: "Nama & jenama, untuk recall & berita · Name & brand, for recalls & news",
+    eyebrow: "STEP 2",
+    title: "Snap the front",
+    sub: "Name & brand — for recalls & news",
   },
 } as const;
 
@@ -37,7 +37,7 @@ export function ScanGuide({
   const copy = COPY[phase];
 
   return (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-ink/80 px-8 text-center">
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-ink/45 px-8 text-center">
       <span className="type-eyebrow mb-5 text-reveal">{copy.eyebrow}</span>
 
       {/* Square holographic frame — reveal L-brackets + a constant scan sweep. */}

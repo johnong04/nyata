@@ -1,7 +1,7 @@
 import "server-only";
-import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { ocrSchema } from "./schema";
+import { aiModel } from "./model";
 
 /**
  * OCR fallback: when OpenFoodFacts misses, read the identity fields off a label
@@ -12,17 +12,15 @@ import { ocrSchema } from "./schema";
  * `labelPhoto` is a base64 data URL (`data:image/...;base64,...`) or a bare
  * base64 string; passed to the model as an image file part.
  */
-const MODEL = "gemini-2.5-flash";
-
 export async function ocrLabel(
   labelPhoto: string,
 ): Promise<{ name: string; brand: string; ingredients: string } | null> {
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) return null;
+  if (!process.env.OPENROUTER_API_KEY) return null;
   if (!labelPhoto) return null;
 
   try {
     const result = await generateObject({
-      model: google(MODEL),
+      model: aiModel(),
       schema: ocrSchema,
       messages: [
         {
