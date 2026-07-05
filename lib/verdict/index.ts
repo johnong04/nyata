@@ -84,7 +84,7 @@ export async function getVerdict(input: {
   if (cachedVerdict) return cachedVerdict;
 
   // 3. No key → honest stub, do not cache.
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) return stubVerdict("no-key");
+  if (!process.env.OPENROUTER_API_KEY) return stubVerdict("no-key");
 
   // 4. Generate + validate. On any failure, stub (never persist an invalid one).
   try {

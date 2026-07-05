@@ -1,21 +1,17 @@
 "use client";
 
 /**
- * ScanControls — the bottom control bar over the camera stage.
- *
- * Manual entry (the always-works demo spine) and a feature-detected flashlight
- * toggle. Manual entry funnels through the SAME `onBarcode` as auto-detect (T6),
- * so both paths hit one code path. All copy is bilingual (§9).
+ * ScanControls — the bottom control bar over the camera stage: the OCR snap /
+ * upload escape hatch and a feature-detected flashlight toggle. Barcode entry is
+ * auto-detect only (manual typing was removed — nobody used it). Labels are kept
+ * to a single concise language so the half-width mono buttons never wrap.
  */
-import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 /**
- * SnapLabelButton — the OCR fallback trigger. A label-wrapped file input
- * (`capture="environment"` opens the rear camera on mobile, falls back to the
- * gallery/file picker elsewhere) so a product not in OpenFoodFacts can still be
- * read off its printed ingredient list. Styled to match the mono control chrome.
+ * SnapLabelButton — the OCR trigger. A label-wrapped file input
+ * (`capture="environment"` opens the rear camera on mobile) so a product not in
+ * OpenFoodFacts can still be read off its printed ingredient list.
  */
 export function SnapLabelButton({
   onPhoto,
@@ -26,10 +22,10 @@ export function SnapLabelButton({
 }) {
   return (
     <label
-      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
+      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-4 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
     >
       <LabelIcon />
-      Imbas label · Snap the label
+      Snap label
       <input
         type="file"
         accept="image/*"
@@ -60,10 +56,10 @@ export function GalleryButton({
 }) {
   return (
     <label
-      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
+      className={`inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-paper/25 bg-ink/50 px-4 font-mono text-xs uppercase tracking-widest text-paper transition-colors hover:bg-ink/70 ${className}`}
     >
       <GalleryIcon />
-      Muat naik · Upload photo
+      Upload
       <input
         type="file"
         accept="image/*"
@@ -91,79 +87,26 @@ function GalleryIcon() {
 }
 
 export function ScanControls({
-  onBarcode,
   onBackPhoto,
   torchSupported,
   torchOn,
   onToggleTorch,
-  autoFocusManual = false,
 }: {
-  onBarcode: (barcode: string) => void;
   onBackPhoto: (file: File) => void;
   torchSupported: boolean;
   torchOn: boolean;
   onToggleTorch: () => void;
-  /** Fallback state opens the manual input immediately and focuses it. */
-  autoFocusManual?: boolean;
 }) {
-  const [manualOpen, setManualOpen] = useState(autoFocusManual);
-  const [value, setValue] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (manualOpen) inputRef.current?.focus();
-  }, [manualOpen]);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const code = value.trim();
-    if (code) onBarcode(code);
-  }
-
   return (
     <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-3 px-6 pb-8">
-      {manualOpen && (
-        <form onSubmit={submit} className="flex gap-2">
-          <Input
-            ref={inputRef}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="Masukkan barkod · Enter barcode"
-            aria-label="Barcode number"
-            className="h-11 flex-1 border-paper/25 bg-ink/60 font-mono text-paper placeholder:text-paper/40 focus-visible:border-reveal"
-          />
-          <Button
-            type="submit"
-            size="lg"
-            className="h-11 bg-reveal px-5 font-mono text-xs uppercase tracking-widest text-ink hover:bg-reveal/90"
-          >
-            Hurai
-          </Button>
-        </form>
-      )}
-
       {/* OCR escape hatch: camera snap OR gallery upload — works when the barcode won't. */}
       <div className="flex gap-2">
         <SnapLabelButton onPhoto={onBackPhoto} className="flex-1" />
         <GalleryButton onPhoto={onBackPhoto} className="flex-1" />
       </div>
 
-      <div className="flex items-center justify-center gap-3">
-        {!manualOpen && (
-          <Button
-            type="button"
-            variant="outline"
-            size="lg"
-            onClick={() => setManualOpen(true)}
-            className="h-11 border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper hover:bg-ink/70 hover:text-paper"
-          >
-            Masukkan barkod · Enter code
-          </Button>
-        )}
-
-        {torchSupported && (
+      {torchSupported && (
+        <div className="flex items-center justify-center">
           <Button
             type="button"
             variant="outline"
@@ -177,71 +120,33 @@ export function ScanControls({
           >
             <TorchIcon />
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
 
 /**
  * NoCameraFallback — camera denied / unavailable. Reuses the redaction idiom: a
- * mono classified eyebrow over an invitation to type a barcode. The manual input
- * is auto-focused so the full flow stays reachable — never a dead end (§9).
+ * mono classified eyebrow over the snap/upload escape hatch (gallery upload works
+ * even with no camera), so the flow is never a dead end (§9).
  */
 export function NoCameraFallback({
-  onBarcode,
   onBackPhoto,
 }: {
-  onBarcode: (barcode: string) => void;
   onBackPhoto: (file: File) => void;
 }) {
-  const [value, setValue] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const code = value.trim();
-    if (code) onBarcode(code);
-  }
-
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-ink px-8 text-center">
       <span className="type-eyebrow mb-4 text-reveal">
         TIADA KAMERA · NO CAMERA
       </span>
       <p className="mb-8 max-w-xs text-paper/80">
-        Kami tak dapat capai kamera. Masukkan nombor barkod untuk teruskan.
+        Kami tak dapat capai kamera. Muat naik gambar label untuk teruskan.
         <span className="mt-1 block text-sm text-paper/50">
-          We can&apos;t reach the camera. Type the barcode number to continue.
+          We can&apos;t reach the camera. Upload a photo of the label to continue.
         </span>
       </p>
-      <form onSubmit={submit} className="flex w-full max-w-xs gap-2">
-        <Input
-          ref={inputRef}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          inputMode="numeric"
-          autoComplete="off"
-          placeholder="Masukkan barkod · Enter barcode"
-          aria-label="Barcode number"
-          className="h-11 flex-1 border-paper/25 bg-ink/60 font-mono text-paper placeholder:text-paper/40 focus-visible:border-reveal"
-        />
-        <Button
-          type="submit"
-          size="lg"
-          className="h-11 bg-reveal px-5 font-mono text-xs uppercase tracking-widest text-ink hover:bg-reveal/90"
-        >
-          Hurai
-        </Button>
-      </form>
-
-      <span className="my-5 font-mono text-xs uppercase tracking-widest text-paper/40">
-        atau · or
-      </span>
       <div className="flex w-full max-w-xs gap-2">
         <SnapLabelButton onPhoto={onBackPhoto} className="flex-1" />
         <GalleryButton onPhoto={onBackPhoto} className="flex-1" />

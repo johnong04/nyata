@@ -74,8 +74,8 @@ export function ScanClient() {
       if (state === "analyzing") return;
       pendingBarcode.current = barcode;
       captureBarcode.current = barcode;
-      // Free the camera BEFORE leaving — a leaked camera light looks broken on film.
-      stopCamera();
+      // Keep the camera LIVE — the video stays as the scan-effect background under
+      // the analyzing loader and the guide. It's freed on route-away / unmount.
       productHit.current = false;
       // Resolve product WHILE the loader plays; the loader's waitFor gate holds
       // onComplete until this settles, then we branch hit → route / miss → capture.
@@ -90,13 +90,14 @@ export function ScanClient() {
         });
       setState("analyzing");
     },
-    [state, stopCamera]
+    [state]
   );
 
   const onAnalyzeComplete = useCallback(() => {
     const barcode = pendingBarcode.current;
     if (!barcode) return;
     if (productHit.current) {
+      stopCamera(); // free the camera as we leave for the verdict page
       router.push(`/product/${encodeURIComponent(barcode)}`);
     } else {
       // OFF miss → guided first-discovery capture, cached under the real barcode.
@@ -104,7 +105,7 @@ export function ScanClient() {
       frontPhoto.current = null;
       setState("capture-back");
     }
-  }, [router]);
+  }, [router, stopCamera]);
 
   /**
    * Fire the photo→verdict round-trip (back photo, optional front photo, cached
@@ -137,14 +138,13 @@ export function ScanClient() {
    * synthetic key. Advances to the front-photo phase.
    */
   const onBackPhoto = useCallback(async (file: File) => {
-    stopCamera();
     try {
       backPhoto.current = await fileToDownscaledDataUrl(file);
     } catch {
       backPhoto.current = null;
     }
     setState("capture-front");
-  }, [stopCamera]);
+  }, []);
 
   const onFrontPhoto = useCallback(
     async (file: File) => {
@@ -166,54 +166,62 @@ export function ScanClient() {
   const onReadComplete = useCallback(() => {
     const res = ocrResultRef.current;
     if (res?.ok && res.barcode) {
+      stopCamera(); // free the camera as we leave for the verdict page
       router.push(`/product/${encodeURIComponent(res.barcode)}`);
     } else {
       setState("ocr-failed");
     }
-  }, [router]);
+  }, [router, stopCamera]);
 
-  // Mount: request the camera.
-  useEffect(() => {
-    let cancelled = false;
-
-    async function start() {
-      if (
-        typeof navigator === "undefined" ||
-        !navigator.mediaDevices?.getUserMedia
-      ) {
-        setState("error");
-        return;
-      }
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-        if (cancelled) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-        // Feature-detect torch (Android Chrome only; hidden otherwise).
-        const track = stream.getVideoTracks()[0];
-        const caps = track?.getCapabilities?.() as
-          | (MediaTrackCapabilities & { torch?: boolean })
-          | undefined;
-        setTorchSupported(Boolean(caps?.torch));
-        setState("scanning");
-      } catch {
-        if (!cancelled) setState("error");
-      }
+  /**
+   * Acquire (or reuse) the rear camera and enter "scanning". Idempotent: if a
+   * live track already exists it just re-binds the video; if the previous track
+   * ended (e.g. the OS camera app took over during a native snap) it re-requests.
+   */
+  const startCamera = useCallback(async () => {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+      setState("error");
+      return;
     }
+    const existing = streamRef.current?.getVideoTracks()[0];
+    if (existing && existing.readyState === "live") {
+      if (videoRef.current && videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+      setState("scanning");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) videoRef.current.srcObject = stream;
+      // Feature-detect torch (Android Chrome only; hidden otherwise).
+      const track = stream.getVideoTracks()[0];
+      const caps = track?.getCapabilities?.() as
+        | (MediaTrackCapabilities & { torch?: boolean })
+        | undefined;
+      setTorchSupported(Boolean(caps?.torch));
+      setState("scanning");
+    } catch {
+      setState("error");
+    }
+  }, []);
 
-    start();
-    return () => {
-      cancelled = true;
-      stopCamera();
-    };
-  }, [stopCamera]);
+  // Mount: request the camera once. Free it on unmount.
+  useEffect(() => {
+    startCamera();
+    return () => stopCamera();
+  }, [startCamera, stopCamera]);
+
+  // Re-acquire whenever we (re-)enter scanning without a live track — the retry
+  // path from ocr-failed lands here, and a native snap can end the prior track.
+  useEffect(() => {
+    if (state !== "scanning") return;
+    const track = streamRef.current?.getVideoTracks()[0];
+    if (!track || track.readyState !== "live") startCamera();
+  }, [state, startCamera]);
 
   // Detection loop — only while scanning and the video has data.
   useEffect(() => {
@@ -272,7 +280,6 @@ export function ScanClient() {
         <>
           <Reticle />
           <ScanControls
-            onBarcode={onBarcode}
             onBackPhoto={onBackPhoto}
             torchSupported={torchSupported}
             torchOn={torchOn}
@@ -282,7 +289,7 @@ export function ScanClient() {
       )}
 
       {state === "error" && (
-        <NoCameraFallback onBarcode={onBarcode} onBackPhoto={onBackPhoto} />
+        <NoCameraFallback onBackPhoto={onBackPhoto} />
       )}
 
       {state === "analyzing" && (

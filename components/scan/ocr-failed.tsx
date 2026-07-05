@@ -40,7 +40,7 @@ export function OcrFailed({
           onClick={onRetry}
           className="h-11 border-paper/25 bg-ink/50 px-5 font-mono text-xs uppercase tracking-widest text-paper hover:bg-ink/70 hover:text-paper"
         >
-          Imbas semula · Scan again
+          Scan again
         </Button>
       </div>
     </div>
