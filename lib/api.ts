@@ -15,8 +15,10 @@
  */
 
 import type {
+  Dossier,
   FeedFilter,
   FeedItem,
+  Member,
   Product,
   Profile,
   Recall,
@@ -33,12 +35,18 @@ import { MOCK_PROFILE } from "@/lib/mock/profile";
 import {
   getProfileReal,
   saveProfileReal,
+  saveMembersReal,
+  setPremiumStubReal,
   getScanHistoryReal,
   logScanReal,
   getRecallsForProductReal,
   getProductByBarcodeReal,
   getVerdictReal,
-  getVerdictFromPhoto as getVerdictFromPhotoReal,
+  getVerdictFromPhotos as getVerdictFromPhotosReal,
+  getDossierReal,
+  getDossierCachedReal,
+  getFeedReal,
+  getFeedRecallsReal,
 } from "@/lib/api-server";
 
 // ---------------------------------------------------------------------------
@@ -153,21 +161,24 @@ export async function getVerdict(barcode: string): Promise<Verdict> {
 }
 
 /**
- * OCR "snap the label" fallback: OFF miss → read the label photo with Gemini
- * vision → AI verdict, cached under a synthetic `ocr-<hash>` barcode. Purely a
- * live path (there is no meaningful mock for an arbitrary user photo); on any
- * failure the fallback reports `ok:false` so the caller shows a friendly retry
- * rather than routing to a dead-end page. `dataUrl` is a base64 JPEG data URL,
- * already downscaled client-side to keep the server-action payload small.
+ * OCR photo→verdict path (§11.4). Pass `barcode` for the OFF-miss branch (the OCR
+ * product is cached under that REAL barcode — the identity anchor); omit it for
+ * the pure "snap the label" branch (a synthetic `ocr-<hash>` key). `backPhoto` =
+ * ingredients side, `frontPhoto` = name/brand side. Purely a live path (no
+ * meaningful mock for an arbitrary user photo); on any failure the fallback
+ * reports `ok:false` so the caller shows a friendly retry rather than a dead-end
+ * page. Photos are base64 JPEG data URLs, already downscaled client-side.
  */
-export async function getVerdictFromPhoto(
-  dataUrl: string,
-): Promise<{ barcode: string; ok: boolean }> {
+export async function getVerdictFromPhotos(input: {
+  barcode?: string;
+  backPhoto?: string;
+  frontPhoto?: string;
+}): Promise<{ barcode: string; ok: boolean }> {
   return withFallback(
-    () => getVerdictFromPhotoReal(dataUrl),
+    () => getVerdictFromPhotosReal(input),
     () => ({ barcode: "", ok: false }),
-    // OCR round-trip (vision + AI) is slower than a barcode lookup; give it room.
-    { timeoutMs: 20000 },
+    // Up to two OCR round-trips + verdict — give it room past the barcode default.
+    { timeoutMs: 25000 },
   );
 }
 
@@ -196,9 +207,14 @@ export async function getRecallsForProduct(p: Product): Promise<Recall[]> {
 
 export async function getFeed(filter: FeedFilter): Promise<FeedItem[]> {
   return withFallback(
-    // S13: awaiting S8 feed_items view — live path not yet built, keep mock as live
-    // so the flip is one line later. Wrapper is in place; behavior is identical.
-    () => mockFeed(filter),
+    // Live: S7 feed_items view via the server-action boundary. null (guest / no
+    // env / query error) -> illustrative mock feed; live rows (incl. empty for
+    // the recalled filter) are authoritative.
+    async () => {
+      const real = await getFeedReal(filter);
+      if (real !== null) return real;
+      return mockFeed(filter);
+    },
     () => {
       // Synchronous mock (fallback path can't await tick; identical ordering).
       const items = [...MOCK_FEED];
@@ -244,8 +260,13 @@ async function mockFeed(filter: FeedFilter): Promise<FeedItem[]> {
  */
 export async function getFeedRecalls(): Promise<Recall[]> {
   return withFallback(
-    // S13: awaiting S11 feed-recall query — mock-as-live for now, filter preserved.
-    () => tick(MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url))),
+    // Live: S7 recalls read via the server-action boundary. Fails closed upstream
+    // (drops any row missing official_url). null -> official-source fixtures.
+    async () => {
+      const real = await getFeedRecallsReal();
+      if (real !== null) return real;
+      return MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url));
+    },
     () => MOCK_FEED_RECALLS.filter((r) => Boolean(r.official_url)),
   );
 }
@@ -288,6 +309,61 @@ export async function saveProfile(conditions: string[]): Promise<void> {
     () => {
       MOCK_PROFILE.conditions = conditions;
     },
+  );
+}
+
+/** Persist this user's members (self + kids); guest → in-memory for the session. */
+export async function saveMembers(members: Member[]): Promise<void> {
+  await withFallback(
+    async () => {
+      const ok = await saveMembersReal(members);
+      if (!ok) MOCK_PROFILE.members = members; // guest/unconfigured → in-memory
+    },
+    () => {
+      MOCK_PROFILE.members = members;
+    },
+  );
+}
+
+/** Stub premium unlock — no payment (§11.5). Persists is_premium for the session. */
+export async function setPremiumStub(on: boolean): Promise<void> {
+  await withFallback(
+    async () => {
+      const ok = await setPremiumStubReal(on);
+      if (!ok) MOCK_PROFILE.is_premium = on;
+    },
+    () => {
+      MOCK_PROFILE.is_premium = on;
+    },
+  );
+}
+
+/**
+ * "On the record" dossier for a brand — attributed, hedged, credibility-gated
+ * third-party reports (specs §11.2). NEVER influences the numeric verdict.
+ * On-demand ("dig deeper"): live grounded call, cached per brand. Null = honest
+ * empty state (nothing on record / no key / all sources failed the gate).
+ */
+export async function getDossier(input: {
+  brand: string;
+  name: string;
+  barcode?: string;
+}): Promise<Dossier | null> {
+  return withFallback(
+    () => getDossierReal(input),
+    () => null, // honest empty; never fabricate an attributed claim
+    { timeoutMs: 25000 }, // grounded search is slower than a lookup
+  );
+}
+
+/** Cache-only dossier read (no AI spend) — for the product page + share badge. */
+export async function getDossierCached(input: {
+  brand: string;
+  name: string;
+}): Promise<Dossier | null> {
+  return withFallback(
+    () => getDossierCachedReal(input),
+    () => null,
   );
 }
 

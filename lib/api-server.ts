@@ -14,15 +14,35 @@
  * // SEAM: S13 flips `lib/api.ts` callers from stubs to these.
  */
 
-import type { Product, Profile, Recall, Scan, Verdict } from "@/lib/types";
+import type {
+  Dossier,
+  FeedFilter,
+  FeedItem,
+  Member,
+  Product,
+  Profile,
+  Recall,
+  Scan,
+  Verdict,
+  VerdictBand,
+} from "@/lib/types";
+import type { Json } from "@/utils/supabase/database.types";
 import { bandForRating } from "@/lib/types";
 import { createClient } from "@/utils/supabase/server";
 import { isAuthConfigured } from "@/lib/auth-config";
-import { recallsForProductFromRows } from "@/lib/recalls/getRecallsForProduct";
+import {
+  recallsForProductFromRows,
+  toRecall,
+  toRow,
+} from "@/lib/recalls/getRecallsForProduct";
 import {
   getProductByBarcode as getProductByBarcodeEngine,
   getVerdict as getVerdictEngine,
 } from "@/lib/verdict";
+import {
+  getDossier as getDossierEngine,
+  getDossierCached as getDossierCachedEngine,
+} from "@/lib/dossier";
 
 const ALLOWED_CONDITIONS = ["allergy", "diabetic", "pregnant", "kid"] as const;
 
@@ -52,32 +72,35 @@ export async function getVerdictReal(barcode: string): Promise<Verdict> {
 }
 
 /**
- * OCR "snap the label" path. Takes a label photo (base64 data URL), derives a
- * STABLE synthetic barcode from the bytes (`ocr-<hash>` — same photo → same
- * barcode, so a re-snap reuses the cached verdict instead of re-billing OCR/AI),
- * and runs the full engine with `labelPhoto` set. The engine OCRs the label →
- * builds a `source:"ocr"` product → caches it under the synthetic barcode → AI
- * verdict. Because the product is cached under that barcode, the existing
- * `/product/<synthetic>` page resolves it on the follow-up navigation.
- *
- * Returns the synthetic barcode plus `ok`: `ok:false` means the engine could not
- * read the label (no OCR key / unreadable photo / AI failure → stub verdict), so
- * the client can surface a friendly "couldn't read the label" retry instead of
- * routing into a dead-end product page. Never throws.
+ * Photo → verdict. If `barcode` is supplied (barcode detected but OFF missed),
+ * the OCR product is cached under that REAL barcode — the identity anchor, so
+ * later scanners hit the cache with the barcode alone (§11.4). With no barcode
+ * (pure "snap the label"), a stable synthetic `ocr-<hash>` key is derived from
+ * the photo bytes so a re-snap reuses the cached verdict instead of re-billing.
+ * `backPhoto` = ingredients side, `frontPhoto` = name/brand side (either optional).
+ * Returns the resolved barcode + `ok` (false = unreadable → client shows a retry,
+ * not a dead-end page). Never throws.
  */
-export async function getVerdictFromPhoto(
-  dataUrl: string,
-): Promise<{ barcode: string; ok: boolean }> {
-  const barcode = syntheticBarcode(dataUrl);
+export async function getVerdictFromPhotos(input: {
+  barcode?: string;
+  backPhoto?: string;
+  frontPhoto?: string;
+}): Promise<{ barcode: string; ok: boolean }> {
+  const key =
+    input.barcode?.trim() ||
+    syntheticBarcode((input.backPhoto ?? "") + (input.frontPhoto ?? ""));
   try {
-    const verdict = await getVerdictEngine({ barcode, labelPhoto: dataUrl });
-    // A stub verdict (rating 5, zero flags) means OCR/AI didn't complete — the
-    // engine never caches stubs, so no product row exists to route to. Signal a
-    // friendly retry rather than a 404.
+    const verdict = await getVerdictEngine({
+      barcode: key,
+      labelPhoto: input.backPhoto,
+      frontPhoto: input.frontPhoto,
+    });
+    // Stub (rating 5, zero flags) ⇒ OCR/AI didn't complete ⇒ no product row to
+    // route to ⇒ signal a friendly retry rather than a 404.
     const ok = !(verdict.rating === 5 && verdict.flags.length === 0);
-    return { barcode, ok };
+    return { barcode: key, ok };
   } catch {
-    return { barcode, ok: false };
+    return { barcode: key, ok: false };
   }
 }
 
@@ -88,6 +111,23 @@ function syntheticBarcode(dataUrl: string): string {
     h = ((h << 5) + h + dataUrl.charCodeAt(i)) | 0;
   }
   return "ocr-" + (h >>> 0).toString(16).padStart(8, "0");
+}
+
+/** Real dossier (cache → grounded Gemini). Null = nothing on record / no key. Never throws. */
+export async function getDossierReal(input: {
+  brand: string;
+  name: string;
+  barcode?: string;
+}): Promise<Dossier | null> {
+  return getDossierEngine(input);
+}
+
+/** Cache-only dossier read (no AI spend). Null when not pre-warmed/cached. */
+export async function getDossierCachedReal(input: {
+  brand: string;
+  name: string;
+}): Promise<Dossier | null> {
+  return getDossierCachedEngine(input);
 }
 
 /** Current user's profile, or null when guest / unauthenticated. */
@@ -103,11 +143,15 @@ export async function getProfileReal(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("conditions, is_premium")
+    .select("conditions, is_premium, members")
     .eq("id", user.id)
     .maybeSingle();
   if (error || !data) return null;
-  return { conditions: data.conditions ?? [], is_premium: data.is_premium };
+  return {
+    conditions: data.conditions ?? [],
+    is_premium: data.is_premium,
+    members: (data.members as unknown as Member[]) ?? [],
+  };
 }
 
 /** Update own conditions. Session-derived id; unknown conditions filtered out. */
@@ -129,6 +173,41 @@ export async function saveProfileReal(conditions: string[]): Promise<boolean> {
     .from("profiles")
     .update({ conditions: clean })
     .eq("id", user.id); // RLS also enforces this; belt-and-braces.
+  return !error;
+}
+
+/** Persist this user's members list (self + kids). Session-derived id. */
+export async function saveMembersReal(members: Member[]): Promise<boolean> {
+  if (!isAuthConfigured()) return false;
+  const supabase = await createClient();
+  if (!supabase) return false;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { error } = await supabase
+    .from("profiles")
+    .update({ members: members as unknown as Json })
+    .eq("id", user.id); // RLS also enforces owner-only.
+  return !error;
+}
+
+/**
+ * STUB premium unlock (§11.5). Flips is_premium with NO payment — real
+ * ToyyibPay/Stripe is a later run (tasks.md Deferred → S12 payments). Session-derived id.
+ */
+export async function setPremiumStubReal(on: boolean): Promise<boolean> {
+  if (!isAuthConfigured()) return false;
+  const supabase = await createClient();
+  if (!supabase) return false;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { error } = await supabase
+    .from("profiles")
+    .update({ is_premium: on })
+    .eq("id", user.id);
   return !error;
 }
 
@@ -217,4 +296,74 @@ export async function logScanReal(barcode: string): Promise<boolean> {
   // A FK violation (product not yet cached) just means no history row — never
   // block the verdict. Fail soft.
   return !error;
+}
+
+/**
+ * Live "Hidden Ingredients" feed (S7). Reads the public `feed_items` view
+ * (products join verdicts, aligned to FeedItem). Per-filter ordering is applied
+ * here; the view's built-in ORDER BY is a harmless default. Returns:
+ *   - null  -> client unavailable (no auth env) or query error -> seam -> mock.
+ *   - [...] -> authoritative live rows (may be empty for the recalled filter).
+ * Feed data is verdict-derived (ingredient-only, self-authored) — no legal
+ * fabrication concern, so empty is a valid answer, not a mock trigger.
+ */
+export async function getFeedReal(
+  filter: FeedFilter,
+): Promise<FeedItem[] | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  let q = supabase
+    .from("feed_items")
+    .select("barcode, name, brand, band, rating, flagged_count, recalled, scanned_at");
+
+  if (filter === "recalled") q = q.eq("recalled", true);
+  q =
+    filter === "newest"
+      ? q.order("scanned_at", { ascending: false })
+      : q.order("rating", { ascending: false }); // worst + recalled lead by rating
+
+  const { data, error } = await q.limit(50);
+  if (error || !data) return null;
+
+  return data.map((row) => {
+    const rating = Number(row.rating);
+    return {
+      barcode: String(row.barcode),
+      name: (row.name as string | null) ?? String(row.barcode),
+      brand: (row.brand as string | null) ?? "",
+      band: ((row.band as VerdictBand | null) ?? bandForRating(rating)) as VerdictBand,
+      rating,
+      flagged_count: Number(row.flagged_count ?? 0),
+      recalled: Boolean(row.recalled),
+      scanned_at: String(row.scanned_at),
+    };
+  });
+}
+
+/**
+ * Live official recalls for the community feed (S7). DATA-INTEGRITY / DEFAMATION
+ * CRITICAL PATH (specs §6): republishes official-source rows only. FAILS CLOSED —
+ * any row missing `official_url` is dropped, never rendered. Returns:
+ *   - null  -> unavailable/error -> seam falls back to official-source fixtures.
+ *   - [...] -> official recalls, newest first, each carrying a live official_url.
+ */
+export async function getFeedRecallsReal(): Promise<Recall[] | null> {
+  try {
+    const supabase = await createClient();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from("recalls")
+      .select(
+        "source, match_barcode, match_brand, match_product, title, official_url, date, severity",
+      )
+      .order("date", { ascending: false })
+      .limit(20);
+    if (error || !data) return null;
+    return data
+      .map((r) => toRecall(toRow(r as unknown as Record<string, unknown>)))
+      .filter((r) => Boolean(r.official_url));
+  } catch {
+    return null;
+  }
 }

@@ -43,6 +43,7 @@ export interface HazardRow {
   name: string;
   flag: string;
   token: VerdictToken;
+  jurisdiction?: string; // short cross-border note (B1)
 }
 
 /** Human flag label per kind — bilingual, sentence-case (design-system §9). */
@@ -65,6 +66,7 @@ export function toHazardRows(flags: Flag[]): HazardRow[] {
     name: f.name,
     flag: KIND_FLAG[f.kind],
     token: SEVERITY_TOKEN[f.severity],
+    jurisdiction: f.jurisdiction?.jurisdiction,
   }));
 }
 
@@ -101,4 +103,5 @@ export interface ShareCardData {
   brand: string;
   verdict: Verdict;
   recall: Recall | null;
+  onTheRecord?: boolean; // a gated dossier exists for this brand
 }

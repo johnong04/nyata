@@ -31,9 +31,11 @@ export const verdictModelSchema = z
 
 export type VerdictModel = z.infer<typeof verdictModelSchema>;
 
-/** Schema for the OCR fallback: just the raw ingredient text lifted off a label. */
+/** Schema for the OCR fallback: the identity fields lifted off a label photo. */
 export const ocrSchema = z
   .object({
+    product_name: z.string(),
+    brand: z.string(),
     ingredients_text: z.string(),
   })
   .strict();

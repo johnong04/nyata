@@ -11,6 +11,7 @@ import {
   getProductByBarcode,
   getVerdict,
   getRecallsForProduct,
+  getDossierCached,
 } from "@/lib/api";
 import { buildShareCard } from "@/lib/share-card/buildShareCard";
 import { primaryRecall } from "@/lib/share-card/verdictMeta";
@@ -31,9 +32,10 @@ export async function GET(
   if (!product) {
     return new Response("Product not found", { status: 404 });
   }
-  const [verdict, recalls] = await Promise.all([
+  const [verdict, recalls, dossier] = await Promise.all([
     getVerdict(barcode),
     getRecallsForProduct(product),
+    getDossierCached({ brand: product.brand, name: product.name }),
   ]);
 
   const [bricolage, monoRegular, monoBold] = await Promise.all([
@@ -49,6 +51,7 @@ export async function GET(
       brand: product.brand,
       verdict,
       recall: primaryRecall(recalls),
+      onTheRecord: Boolean(dossier?.sources.length),
     }),
     {
       width: 1080,

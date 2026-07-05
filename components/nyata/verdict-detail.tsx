@@ -10,39 +10,48 @@
  * on-screen only and never baked into the flat share export (that's S4).
  */
 import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import type { Product, Verdict, Recall } from "@/lib/types";
+import type { Product, Verdict, Recall, Dossier, Member } from "@/lib/types";
 import { RedactionBar } from "@/components/nyata/redaction-bar";
 import { VerdictStamp } from "@/components/nyata/verdict-stamp";
 import { HazardPanel } from "@/components/nyata/hazard-panel";
 import { RecallBlock } from "@/components/nyata/recall-block";
-import { PremiumUpsell } from "@/components/nyata/premium-upsell";
+import { OnTheRecord } from "@/components/nyata/on-the-record";
+import { PersonalRiskSection } from "@/components/nyata/personal-risk";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { buttonVariants } from "@/components/ui/button";
+import { DUR, EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 export function VerdictDetail({
   product,
   verdict,
   recalls,
+  dossier,
+  members,
+  isPremium,
 }: {
   product: Product;
   verdict: Verdict;
   recalls: Recall[];
+  dossier: Dossier | null;
+  members: Member[];
+  isPremium: boolean;
 }) {
   // The un-redaction: bar covers hazards, wipes on mount (~450ms). The
   // RedactionBar primitive owns the reduced-motion floor (cross-fade), but we
   // still short-circuit the timer so reduced-motion reveals instantly.
+  const reduce = useReducedMotion();
   const [revealed, setRevealed] = useState(false);
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setRevealed(true);
       return;
     }
-    const t = setTimeout(() => setRevealed(true), 450);
+    const t = setTimeout(() => setRevealed(true), DUR.reveal * 1000);
     return () => clearTimeout(t);
   }, []);
 
@@ -64,7 +73,15 @@ export function VerdictDetail({
         <CardContainer className="w-full py-0" containerClassName="py-0">
           <CardBody className="h-auto w-full rounded-2xl bg-card p-6">
             <CardItem translateZ={40} className="w-full">
-              <VerdictStamp rating={verdict.rating} />
+              {/* Stamp pop-in — scale 0.96→1, timed to land as the redaction bar
+                  finishes wiping so the reveal reads as ONE moment (§7). */}
+              <motion.div
+                initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: DUR.reveal, ease: EASE.out }}
+              >
+                <VerdictStamp rating={verdict.rating} />
+              </motion.div>
             </CardItem>
           </CardBody>
         </CardContainer>
@@ -82,18 +99,27 @@ export function VerdictDetail({
         <HazardPanel flags={verdict.flags} />
       </RedactionBar>
 
+      {/* Scan-time "who's this for?" — re-flags this verdict per member (§11.5).
+          Premium-gated behind the stub unlock; replaces the inert PremiumUpsell. */}
+      <PersonalRiskSection
+        verdict={verdict}
+        members={members}
+        isPremium={isPremium}
+      />
+
       {/* Official recall — renders nothing when there are none. */}
       <RecallBlock recalls={recalls} />
 
-      {/* Premium upsell — risks stay redacted. */}
-      <PremiumUpsell />
+      {/* On the record — attributed third-party reports (never affects the verdict). */}
+      <OnTheRecord product={product} initialDossier={dossier} />
 
       {/* Share → S4 flat share export flow. */}
       <Link
         href={`/share/${product.barcode}`}
         className={cn(
           buttonVariants(),
-          "h-11 w-full rounded-xl bg-ink text-paper hover:bg-ink/90"
+          // Turmeric keyline-ring = the primary action is live (S8 accent affordance).
+          "h-11 w-full rounded-xl bg-ink text-paper ring-1 ring-reveal ring-offset-2 ring-offset-paper transition-transform hover:bg-ink/90 active:scale-[.98]"
         )}
       >
         Kongsi · Share verdict →

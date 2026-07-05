@@ -80,12 +80,9 @@ export async function verifyOtp(
 
 /**
  * Google OAuth (PKCE). Returns the provider URL for the client to navigate to.
- *
- * IMPORTANT (production reality): the Google PROVIDER is NOT enabled in this
- * Supabase project. `signInWithOAuth` still returns a URL, but the round-trip
- * would fail at Google. The AuthForm keeps the button as "coming soon" so this
- * never hard-errors in the demo; this action stays wired for the moment the
- * provider is switched on (no code change needed then).
+ * The Google provider IS enabled in this Supabase project (commit f6ea3b2), so
+ * the round-trip completes at Google → /auth/callback. Guest mode (no auth env)
+ * returns `auth-unconfigured` and the AuthForm disables the button.
  */
 export async function signInWithGoogle(): Promise<OAuthResult> {
   if (!isAuthConfigured()) return { ok: false, error: "auth-unconfigured" };

@@ -34,7 +34,7 @@ const MONO = "Space Mono";
 const DISPLAY = "Bricolage Grotesque";
 
 export function buildShareCard(data: ShareCardData): ReactElement {
-  const { barcode, productName, brand, verdict, recall } = data;
+  const { barcode, productName, brand, verdict, recall, onTheRecord } = data;
   const v = ratingToVerdict(verdict.rating);
   const color = verdictColor(v.token);
   const colorBg = verdictColorBg(v.token);
@@ -114,6 +114,25 @@ export function buildShareCard(data: ShareCardData): ReactElement {
         >
           DECLASSIFIED
         </div>
+        {onTheRecord ? (
+          <div
+            style={{
+              display: "flex",
+              position: "absolute",
+              top: 132,
+              right: 56,
+              border: `3px solid ${REVEAL}`,
+              color: REVEAL,
+              fontFamily: MONO,
+              fontWeight: 700,
+              fontSize: 20,
+              letterSpacing: "0.12em",
+              padding: "6px 14px",
+            }}
+          >
+            ON THE RECORD
+          </div>
+        ) : null}
       </div>
 
       {/* 2 — ONE redaction bar frozen mid-lift (THE SIGNATURE). The ink bar
@@ -159,7 +178,9 @@ export function buildShareCard(data: ShareCardData): ReactElement {
             {productName}
           </div>
         </div>
-        {/* turmeric glow sliver — the light leaking from under the lifting bar */}
+        {/* turmeric glow sliver — the light leaking from under the lifting bar.
+            Thicker solid edge + a gradient falloff so the mid-lift signature
+            reads unmistakably even at feed-thumbnail scale (§8). */}
         <div
           style={{
             display: "flex",
@@ -167,8 +188,19 @@ export function buildShareCard(data: ShareCardData): ReactElement {
             top: 102,
             left: 56,
             width: 700,
-            height: 10,
+            height: 14,
             backgroundColor: REVEAL,
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            position: "absolute",
+            top: 116,
+            left: 56,
+            width: 700,
+            height: 34,
+            backgroundImage: `linear-gradient(to bottom, ${REVEAL}, rgba(242,169,0,0))`,
           }}
         />
         {/* the ink redaction bar, frozen mid-lift over the top ~72% width */}
@@ -333,8 +365,7 @@ export function buildShareCard(data: ShareCardData): ReactElement {
                 key={i}
                 style={{
                   display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
+                  flexDirection: "column",
                   backgroundColor: SURFACE_2,
                   borderBottom: `2px solid ${LINE}`,
                   padding: "11px 24px",
@@ -343,46 +374,67 @@ export function buildShareCard(data: ShareCardData): ReactElement {
                 <div
                   style={{
                     display: "flex",
-                    width: 16,
-                    height: 16,
-                    borderRadius: 8,
-                    backgroundColor: verdictColor(h.token),
-                    marginRight: 20,
-                  }}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontWeight: 700,
-                    fontSize: 26,
-                    color: INK,
-                    width: 110,
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  {h.code}
+                  <div
+                    style={{
+                      display: "flex",
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      backgroundColor: verdictColor(h.token),
+                      marginRight: 20,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontWeight: 700,
+                      fontSize: 26,
+                      color: INK,
+                      width: 110,
+                    }}
+                  >
+                    {h.code}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 26,
+                      color: INK_70,
+                      flexGrow: 1,
+                    }}
+                  >
+                    {h.name}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 22,
+                      color: INK_40,
+                    }}
+                  >
+                    {h.flag}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontSize: 26,
-                    color: INK_70,
-                    flexGrow: 1,
-                  }}
-                >
-                  {h.name}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    fontFamily: MONO,
-                    fontSize: 22,
-                    color: INK_40,
-                  }}
-                >
-                  {h.flag}
-                </div>
+                {h.jurisdiction ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      fontFamily: MONO,
+                      fontSize: 20,
+                      color: REVEAL,
+                      marginTop: 4,
+                    }}
+                  >
+                    ⚑ {h.jurisdiction}
+                  </div>
+                ) : null}
               </div>
             ))}
             {hazards.length > 2 ? (

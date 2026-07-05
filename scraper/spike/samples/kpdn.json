@@ -1,0 +1,25 @@
+{
+  "source": "KPDN",
+  "source_label": "KPDN",
+  "title": "Thermos® Stainless King Food Jars (SK3000 & SK3020 Series)",
+  "product": "Thermos® Stainless King Food Jars (SK3000 & SK3020 Series)",
+  "brand": "Thermos®",
+  "reason": "Preemptive Free Stopper Replacement ProgramThis preemptive replacement program applies ONLY to the Stainless King Food Jars listed above that were sold betweenMarch 2008 and December 2025 through our nationwide authorized retailers. The stopper eligible for replacement has no pressure relief valve in the center.Thermos Malaysia will provide the replacement stopper with center pressure relief valve at no cost to you.No receipt or proof of purchase is required.",
+  "date": "2026-06-24",
+  "severity": "waspada",
+  "official_url": "https://mysafe.kpdn.gov.my/portal/post/3",
+  "match_brand": "thermos",
+  "match_product": "thermos stainless king food jars sk3000 sk3020 series",
+  "match_barcode": null,
+  "_tool": "requests+parser",
+  "_selectors": {
+    "table": "table.table-bordered.table-striped",
+    "row": "tbody tr",
+    "product": "td:nth-child(2)",
+    "reason": "td:nth-child(5)",
+    "date": "td:nth-child(6)",
+    "official_url": "portal listing (relevant-website col is brand-external, non-.gov.my)"
+  },
+  "_reachable": true,
+  "_notes": "mySAFE/KPDN portal server-rendered recall table; barcode absent in gov recalls (match on brand+product)."
+}

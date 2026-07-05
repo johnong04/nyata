@@ -39,6 +39,13 @@ export const MOCK_VERDICTS: Record<string, Verdict> = {
         note_en: "High added-sugar content per serving.",
         severity: "med",
       },
+      {
+        name: "Peanut traces (shared line)",
+        kind: "allergen",
+        note_bm: "Mungkin mengandungi kesan kacang tanah dari barisan pengeluaran yang sama.",
+        note_en: "May contain peanut traces from a shared production line.",
+        severity: "med",
+      },
     ],
     rating: 5.6,
     summary_bm:

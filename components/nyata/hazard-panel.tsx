@@ -20,6 +20,22 @@ const SEV_LABEL: Record<string, string> = {
   selamat: "RENDAH · LOW",
 };
 
+/**
+ * Honest source attribution. A Wikipedia link must NEVER read as an official
+ * {authority} link — so a wikipedia.org host renders "per Wikipedia · cites
+ * {authority}", while a primary authority page renders "{authority} · {domain}".
+ */
+function sourceAttribution(authority: string, sourceUrl: string): string {
+  let host = "";
+  try {
+    host = new URL(sourceUrl).hostname.replace(/^www\./, "");
+  } catch {
+    host = sourceUrl;
+  }
+  const isPrimary = !/(^|\.)wikipedia\.org$/i.test(host);
+  return isPrimary ? `${authority} · ${host}` : `per Wikipedia · cites ${authority}`;
+}
+
 export function HazardPanel({ flags }: { flags: Flag[] }) {
   if (!flags || flags.length === 0) {
     return (
@@ -55,6 +71,25 @@ export function HazardPanel({ flags }: { flags: Flag[] }) {
               </div>
               <p className="relative mt-1 text-sm text-ink-70">{f.note_en}</p>
               <p className="relative mt-0.5 text-sm text-ink-40">{f.note_bm}</p>
+              {f.jurisdiction && (
+                <div className="relative mt-2 border-l-2 border-reveal pl-2">
+                  <span className="block font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-reveal">
+                    LINTAS SEMPADAN · CROSS-BORDER
+                  </span>
+                  <p className="mt-0.5 text-sm text-ink">{f.jurisdiction.jurisdiction}</p>
+                  <p className="mt-1 font-mono text-xs text-ink-70">
+                    &ldquo;{f.jurisdiction.verbatim_quote}&rdquo;
+                  </p>
+                  <a
+                    href={f.jurisdiction.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 block font-mono text-xs text-ink-40 underline underline-offset-2 break-all"
+                  >
+                    {sourceAttribution(f.jurisdiction.authority, f.jurisdiction.source_url)}
+                  </a>
+                </div>
+              )}
               <span
                 className={`relative mt-2 block font-mono text-xs uppercase tracking-[0.16em] ${SEV_ACCENT[token]}`}
               >

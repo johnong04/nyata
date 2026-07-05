@@ -23,6 +23,20 @@ export type FlagKind =
 
 export type Severity = "low" | "med" | "high";
 
+/**
+ * A verified cross-jurisdiction citation attached to a flag from the B1
+ * ingredient-hazard table. NEVER model-authored: the model writes the flag
+ * note/severity; this citation is attached deterministically from the verified
+ * table (specs §11.3) — same guardrail philosophy as the legal disclaimer copy.
+ */
+export interface JurisdictionFlag {
+  authority: string;      // e.g. "EFSA"
+  jurisdiction: string;   // e.g. "Permitted in Malaysia; banned in the EU (2022)"
+  status: string;         // classification, e.g. "possible carcinogen (IARC 2B)"
+  verbatim_quote: string; // exact text present at source_url
+  source_url: string;     // live, verified link
+}
+
 export interface Flag {
   e_number?: string;
   name: string;
@@ -30,6 +44,8 @@ export interface Flag {
   note_bm: string;
   note_en: string;
   severity: Severity;
+  /** Verified regulatory citation (B1). Attached post-validation, never persisted from the model. */
+  jurisdiction?: JurisdictionFlag;
 }
 
 export interface Verdict {
@@ -72,9 +88,64 @@ export interface Scan {
   scanned_at: string; // ISO
 }
 
+/** Closed personalization vocabulary — template chips only, no free-text (§11.5). */
+export type PersonalCondition =
+  | "diabetic"
+  | "pregnant"
+  | "kid"
+  | "nuts"
+  | "dairy"
+  | "gluten"
+  | "soy"
+  | "shellfish"
+  | "hbp";
+
+/** Chip labels (BM · EN) — the single source for every condition-chip UI. */
+export const PERSONAL_CONDITIONS: {
+  value: PersonalCondition;
+  bm: string;
+  en: string;
+}[] = [
+  { value: "diabetic", bm: "Kencing manis", en: "Diabetic" },
+  { value: "pregnant", bm: "Mengandung", en: "Pregnant" },
+  { value: "kid", bm: "Untuk anak", en: "For kid" },
+  { value: "nuts", bm: "Kacang", en: "Nuts" },
+  { value: "dairy", bm: "Tenusu", en: "Dairy" },
+  { value: "gluten", bm: "Gluten", en: "Gluten" },
+  { value: "soy", bm: "Soya", en: "Soy" },
+  { value: "shellfish", bm: "Kerang", en: "Shellfish" },
+  { value: "hbp", bm: "Darah tinggi", en: "High BP" },
+];
+
+/** A person you buy for — self or a kid. Stored in profiles.members (jsonb). */
+export interface Member {
+  id: string;
+  name: string;
+  conditions: PersonalCondition[];
+}
+
 export interface Profile {
-  conditions: string[];
+  conditions: string[]; // legacy self-conditions (S13); superseded by members
   is_premium: boolean;
+  members: Member[];
+}
+
+/** One attributed source card in a dossier (§11.2: named source + working link). */
+export interface DossierSource {
+  source_name: string;
+  credibility_label: "high" | "med" | "low";
+  verbatim_snippet: string;
+  url: string;
+  date: string; // ISO or "" if unknown
+}
+
+/** A brand's "On the record" dossier — attributed, hedged, credibility-gated. */
+export interface Dossier {
+  brand_key: string;
+  summary_en: string;
+  summary_bm: string;
+  sources: DossierSource[];
+  prewarmed: boolean;
 }
 
 /** Map a 0–10 risk score → verdict band (design-system §3). */

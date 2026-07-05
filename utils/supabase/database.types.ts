@@ -16,6 +16,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      dossiers: {
+        Row: {
+          brand_key: string
+          created_at: string
+          id: string
+          model: string | null
+          prewarmed: boolean
+          product_barcode: string | null
+          sources: Json
+          summary_bm: string
+          summary_en: string
+          updated_at: string
+        }
+        Insert: {
+          brand_key: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          prewarmed?: boolean
+          product_barcode?: string | null
+          sources?: Json
+          summary_bm: string
+          summary_en: string
+          updated_at?: string
+        }
+        Update: {
+          brand_key?: string
+          created_at?: string
+          id?: string
+          model?: string | null
+          prewarmed?: boolean
+          product_barcode?: string | null
+          sources?: Json
+          summary_bm?: string
+          summary_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ingredient_hazards: {
+        Row: {
+          aliases: string[]
+          authority: string
+          classification: string
+          created_at: string
+          e_number: string | null
+          id: string
+          ingredient: string
+          jurisdiction: string
+          kind: string
+          severity: string
+          source_url: string
+          verbatim_quote: string
+          verified_at: string | null
+        }
+        Insert: {
+          aliases?: string[]
+          authority: string
+          classification: string
+          created_at?: string
+          e_number?: string | null
+          id?: string
+          ingredient: string
+          jurisdiction: string
+          kind: string
+          severity: string
+          source_url: string
+          verbatim_quote: string
+          verified_at?: string | null
+        }
+        Update: {
+          aliases?: string[]
+          authority?: string
+          classification?: string
+          created_at?: string
+          e_number?: string | null
+          id?: string
+          ingredient?: string
+          jurisdiction?: string
+          kind?: string
+          severity?: string
+          source_url?: string
+          verbatim_quote?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string
@@ -49,18 +136,21 @@ export type Database = {
           created_at: string
           id: string
           is_premium: boolean
+          members: Json
         }
         Insert: {
           conditions?: string[]
           created_at?: string
           id: string
           is_premium?: boolean
+          members?: Json
         }
         Update: {
           conditions?: string[]
           created_at?: string
           id?: string
           is_premium?: boolean
+          members?: Json
         }
         Relationships: []
       }
