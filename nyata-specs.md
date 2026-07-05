@@ -178,3 +178,41 @@ Closed **template chips** (diabetic/pregnant/kid/nuts/dairy/gluten/soy/shellfish
 
 ### 11.7 Status (Run 2 shipped 2026-07-05, `john-run2` → PR #1)
 Live in Supabase: **74 recalls** (KPDN 43 / NPRA 31) · **34 ingredient_hazards** (7 primary-authority citations, 27 "per Wikipedia · cites {authority}") · **49 pre-warmed dossiers**. Prod env keys set (Gemini + OpenRouter). Recall scraper populates via `python scraper/recalls.py` (MOH skipped — dead source, no fallback).
+
+---
+
+## 12. Product roadmap — V1 today, V2/V3 next
+
+> **Current version: V1 (food safety).** Everything above this section is V1. V2/V3 below are the
+> explicit future roadmap — NOT built yet, not in scope for the house. They exist to show V1 is the
+> trust-building first act of a larger product, not a dead-end utility.
+> Arc: **V1 trust (safety) → V2 daily habit + recurring revenue (nutrition agent) → V3 global (halal travel).**
+> "Nyata = revealed" holds across all three.
+
+### V2 — Nutrition & the proactive AI nutrition agent
+- **Same scan, two layers — no toggle.** Every scan returns the safety verdict first (the instant hook,
+  unchanged from V1), and *also* extracts calories/macros. An "I'm eating this" tap logs it to a daily
+  nutrition diary. One gesture, zero added friction; safety acquires the user, nutrition retains them.
+- **Why it matters:** V1 is low-frequency by nature (you scan a product once, verdict is cached). Nutrition
+  tracking is daily. V2 converts a utility into a habit — the retention layer V1 structurally lacks.
+- **Proactive AI nutrition agent (the premium tier):** doesn't wait to be asked. Watches the diary, surfaces
+  nutrition gaps ("low protein 4 days running, sodium 40% over"), and suggests **realistic Malaysian food
+  choices** — nasi lemak / mamak / kopitiam reality in BM+English, halal-aware — not a Western quinoa bot.
+  This is the recurring-subscription justification V1's one-time unlocks lack, and the moat vs
+  MyFitnessPal-class trackers (generic DB, no MY food context, no safety layer).
+- **Gamification (V2.5, deliberately deferred):** an avatar whose health state mirrors your daily food intake
+  is high-concept but art-quality-critical — a mediocre avatar cheapens the brand, so it slips to V3-or-never.
+  Interim gamification ships cheap: scan streaks + a weekly shareable "health score" card reusing the V1
+  verdict-card engine (postable → feeds the attention loop).
+
+### V3 — Restaurant halal verification (travel)
+- **The scan goes from products to places.** Snap a restaurant — especially overseas — and Nyata checks
+  whether its halal / Muslim-friendly claim actually holds, beyond tourist reviews and hearsay.
+- **Defensible core: certificate verification, not vibe judgment.** JAKIM publishes the registry of
+  recognized foreign halal certification bodies (similarly MUIS SG, etc.). Nyata verifies whether a displayed
+  cert traces to a recognized body — a fact-checkable claim — and layers attributed, credibility-gated
+  third-party reports on top, under the same legal posture as §11.2 (attributed · hedged · linked · never
+  Nyata's own accusation). "Certified by X, which is JAKIM-recognized" / "no recognized certification found —
+  verify locally" — never "this restaurant is lying".
+- **Why it matters:** halal assurance while traveling is a top pain for Muslim travelers, and it takes Nyata
+  beyond Malaysia — the global-market act of the story. Same trust engine, same scan gesture, new surface.
