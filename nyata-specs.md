@@ -164,7 +164,7 @@ Nyata is a **useful consumer-watchdog operating deliberately and responsibly in 
 ### 11.3 Three data systems
 - **A — product + verdict** (per scan, organic): OFF REST API (barcode) **or** Gemini OCR (photo) → AI verdict **grounded on B1**. Cached in `products` / `verdicts`. No scraping.
 - **B1 — curated hazard table** (built once, VERIFIED): `ingredient/E-number → classification · authority · verbatim_quote · url · jurisdiction`. **`jurisdiction` captures cross-country gaps** (e.g. "allowed MY, banned EU" — E171 titanium dioxide, potassium bromate, BVO). Anti-hallucination = **every row has a live, re-fetched link + verbatim quote; rows whose link 404s or doesn't back the claim are dropped** (hard criterion). Built via WebSearch + Firecrawl/WebFetch + `/deep-research`; **customized to hazardous ingredients common in MY food**.
-- **B2 — live dossier** (new `dossiers` table; Supabase text, free-tier-fine): **runtime** = single **Gemini Google-Search-grounded** call (web), cached per brand/product. **Pre-warm ~50 popular MY brands at build-time** via agentic pass (`last30days` social + web + Firecrawl). Appears as attributed source cards + hedged summary + credibility labels. No DeepSeek; no agent-reach (install overhead).
+- **B2 — live dossier** (`dossiers` table; Supabase text, free-tier-fine): **runtime** = single **OpenRouter web-search** call (`google/gemini-2.5-flash` + Exa `web` plugin), cached per brand/product. **Pre-warm ~50 popular MY brands** via `scripts/dossiers.prewarm.ts`. Appears as attributed source cards + hedged summary + credibility labels. No DeepSeek; no agent-reach.
 - **C — official recalls**: **Scrapling** scrapes MOH/mySAFE/NPRA → `recalls` table, matched brand+name. **Spike reachability first (S3); degrade to the 4 seeds if red.** Scrapling's *only* job.
 
 ### 11.4 Scan identity flow
@@ -174,4 +174,7 @@ Barcode = unique **cache/dedup KEY, not a name**. Matrix: OFF-hit → 0 photos �
 Closed **template chips** (diabetic/pregnant/kid/nuts/dairy/gluten/soy/shellfish/HBP — no free-text). **`members jsonb`** on `profiles` (self + kids). Scan-time **"who's this for?"** selector → verdict re-flags per member. **Premium-gated with a STUB unlock** (real payments deferred to a later run).
 
 ### 11.6 AI / tooling
-Gemini free API (Google-Search grounding + OCR + verdict); verdict/dossier caches protect quota. Firecrawl = build-time fetch/verify. `last30days` = social gathering (build-time, pre-warm). `/deep-research` = the hazard-ingredient + popular-brand research. UI slices **must invoke `/frontend-design` + `/web-animation-design`**.
+**Gemini** (free API) = OCR + verdict. **OpenRouter** (`OPENROUTER_API_KEY`, `gemini-2.5-flash` + Exa web plugin) = live dossier. No DeepSeek. Firecrawl/WebFetch = build-time hazard-source verify. `/deep-research` = hazard-ingredient + brand research. Caches protect quota. UI slices **must invoke `/frontend-design` + `/web-animation-design`**. Run scripts with `node --conditions=react-server --env-file=.env.local --import tsx <script>` (the `server-only` guard needs the RSC condition).
+
+### 11.7 Status (Run 2 shipped 2026-07-05, `john-run2` → PR #1)
+Live in Supabase: **74 recalls** (KPDN 43 / NPRA 31) · **34 ingredient_hazards** (7 primary-authority citations, 27 "per Wikipedia · cites {authority}") · **49 pre-warmed dossiers**. Prod env keys set (Gemini + OpenRouter). Recall scraper populates via `python scraper/recalls.py` (MOH skipped — dead source, no fallback).
